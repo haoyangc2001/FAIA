@@ -1,0 +1,49 @@
+version: v001
+table: inventory_snapshot
+description: 库存快照表，记录指定日期各节点 SKU 的账面库存。
+primary_key:
+  - date
+  - node_id
+  - sku_id
+foreign_keys:
+  - field: date
+    references: calendar.date
+  - field: node_id
+    references: warehouse_master.node_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: date
+    type: date
+    nullable: false
+    description: 快照日期。
+  - name: node_id
+    type: string
+    nullable: false
+    description: 仓节点 ID。
+  - name: node_type
+    type: string
+    nullable: false
+    allowed_values: [RDC, FDC]
+    description: 仓节点类型。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: on_hand_qty
+    type: integer
+    nullable: false
+    description: 当前可用库存。
+  - name: reserved_qty
+    type: integer
+    nullable: false
+    description: 已预留库存。
+  - name: in_transit_qty
+    type: integer
+    nullable: false
+    description: 在途库存。
+constraints:
+  - on_hand_qty >= 0
+  - reserved_qty >= 0
+  - in_transit_qty >= 0
+

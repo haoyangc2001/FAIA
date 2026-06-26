@@ -1,0 +1,183 @@
+data_version: v001
+registered_at: '2026-06-26T12:42:03'
+status: validated
+source:
+  config: data/configs/synthetic_small.yaml
+  seed: 20260626
+  schema_version: v001
+  generator_version: v001
+  source_config_data_version: v001_small
+artifact_manifests:
+  synthetic: data/synthetic/v001/manifest.yaml
+  processed: data/processed/v001/manifest.yaml
+  splits: data/splits/v001/manifest.yaml
+  ml_topk_features: data/features/ml_topk/v001/manifest.yaml
+  inventory_features: data/features/inventory/v001/manifest.yaml
+artifacts:
+  synthetic:
+    dir: data/synthetic/v001
+    counts:
+      sku_master: 3000
+      warehouse_master: 14
+      sku_fdc_eligibility: 36000
+      calendar: 180
+      promotion_plan: 1948
+      orders: 1234855
+      order_items: 1856325
+      inventory_snapshot: 4235400
+      transfer_plan: 51691
+      stockout_events: 2290830
+      cost_config: 4
+      fdc_date_order_cells: 2160
+      fdc_sku_date_demand_cells: 624438
+    files:
+    - path: data/synthetic/v001/sku_master.csv
+      bytes: 222372
+      rows: 3000
+    - path: data/synthetic/v001/warehouse_master.csv
+      bytes: 956
+      rows: 14
+    - path: data/synthetic/v001/sku_fdc_eligibility.csv
+      bytes: 1206780
+      rows: 36000
+    - path: data/synthetic/v001/calendar.csv
+      bytes: 6510
+      rows: 180
+    - path: data/synthetic/v001/promotion_plan.csv
+      bytes: 115985
+      rows: 1948
+    - path: data/synthetic/v001/orders.csv
+      bytes: 76129455
+      rows: 1234855
+    - path: data/synthetic/v001/order_items.csv
+      bytes: 57295229
+      rows: 1856325
+    - path: data/synthetic/v001/inventory_snapshot.csv
+      bytes: 165360926
+      rows: 4235400
+    - path: data/synthetic/v001/transfer_plan.csv
+      bytes: 3262350
+      rows: 51691
+    - path: data/synthetic/v001/stockout_events.csv
+      bytes: 152472766
+      rows: 2290830
+    - path: data/synthetic/v001/cost_config.csv
+      bytes: 288
+      rows: 4
+  processed:
+    dir: data/processed/v001
+    counts:
+      fdc_sku_daily_demand: 624438
+      order_type_table: 274420
+      order_type_items: 695935
+      inventory_daily_state: 4235400
+      candidate_pool_base: 32734
+    files:
+    - path: data/processed/v001/fdc_sku_daily_demand.csv
+      bytes: 20661975
+      rows: 624438
+    - path: data/processed/v001/order_type_table.csv
+      bytes: 20161209
+      rows: 274420
+    - path: data/processed/v001/order_type_items.csv
+      bytes: 22269959
+      rows: 695935
+    - path: data/processed/v001/inventory_daily_state.csv
+      bytes: 182651190
+      rows: 4235400
+    - path: data/processed/v001/candidate_pool_base.csv
+      bytes: 3295897
+      rows: 32734
+  features:
+    ml_topk:
+      dir: data/features/ml_topk/v001
+      counts:
+        fdc_sku_features: 98202
+      files:
+      - path: data/features/ml_topk/v001/fdc_sku_features.csv
+        bytes: 9628650
+        rows: 98202
+    inventory:
+      dir: data/features/inventory/v001
+      counts:
+        inventory_features: 52590
+      files:
+      - path: data/features/inventory/v001/inventory_features.csv
+        bytes: 3149969
+        rows: 52590
+  splits:
+    dir: data/splits/v001
+    counts:
+      train_dates: 126
+      val_dates: 27
+      test_dates: 27
+    ranges:
+      train:
+      - '2026-01-01'
+      - '2026-05-06'
+      validation:
+      - '2026-05-07'
+      - '2026-06-02'
+      test:
+      - '2026-06-03'
+      - '2026-06-29'
+    files:
+    - path: data/splits/v001/train_dates.txt
+      bytes: 1386
+      rows: 126
+    - path: data/splits/v001/val_dates.txt
+      bytes: 297
+      rows: 27
+    - path: data/splits/v001/test_dates.txt
+      bytes: 297
+      rows: 27
+validation:
+  status: PASS
+  total_checks: 58
+  failed_checks: 0
+  warnings: 0
+  report: data/validation/reports/v001_validation_report.md
+  summary: data/validation/reports/v001_validation_summary.json
+reproducibility:
+  commands:
+  - python3 data/scripts/generate_synthetic_data.py --config data/configs/synthetic_small.yaml
+    --data-version v001
+  - python3 data/scripts/build_stage1_artifacts.py --config data/configs/synthetic_small.yaml
+    --data-version v001
+  - python3 data/scripts/validate_stage1_data.py --data-version v001
+  - python3 data/scripts/register_data_version.py --config data/configs/synthetic_small.yaml
+    --data-version v001
+control_file_checksums:
+- path: data/configs/synthetic_small.yaml
+  bytes: 1623
+  sha256: 93ac0f2e6ccacf4fcbbabd66fcffd53d60f934d3841c3234fb4f8c634321898f
+- path: data/scripts/generate_synthetic_data.py
+  bytes: 36146
+  sha256: d744944a7a57fa0ee1af6240de84218fc84e5ba7d2136e996f6505d1db775a64
+- path: data/scripts/build_stage1_artifacts.py
+  bytes: 22866
+  sha256: 099277be6bbba9ec513f474571d6a90108f1bd2b99c1d8cbf77edc188c0a4559
+- path: data/scripts/validate_stage1_data.py
+  bytes: 39085
+  sha256: 26c116ce63351a5d6d97a0107e72350a08e6d645cecb549302fb1eb18fd9dbda
+- path: data/synthetic/v001/manifest.yaml
+  bytes: 547
+  sha256: 5a85a013672143c7abdd8618b3f4e931c903069463aae667b6cd6d129a606f40
+- path: data/processed/v001/manifest.yaml
+  bytes: 250
+  sha256: 1d496be6422b8e9b6c1d1b7b708533698387ad6cc70b7f56ea1b0873da660ceb
+- path: data/splits/v001/manifest.yaml
+  bytes: 282
+  sha256: 3e45ef545a4ec7ca1bb2c55eb0cf419244cb98bea7538c190e622965d74986c8
+- path: data/features/ml_topk/v001/manifest.yaml
+  bytes: 146
+  sha256: d4c350ff9b1368a76b99de4823994db513d0f4033d21888eebdf14e740ed5e37
+- path: data/features/inventory/v001/manifest.yaml
+  bytes: 148
+  sha256: 1ba7505189b241f099d45c4fb9d982ecf3ac4c2a245b8cc4fb325f42e576bfb4
+- path: data/validation/reports/v001_validation_summary.json
+  bytes: 999
+  sha256: dfe0591fdc58390f951b83e408140a241cc24f08f2f3831ff1b5a541a3aa7944
+- path: data/validation/reports/v001_validation_report.md
+  bytes: 10530
+  sha256: c7290b3a5f93101ee9210f80f6d02052ff8de994e1015f089378a2c1dc6b3c90

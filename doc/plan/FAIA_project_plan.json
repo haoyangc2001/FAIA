@@ -1,0 +1,1988 @@
+{
+  "document_type": "project_plan",
+  "project_name": "FAIA",
+  "project_full_name": "Fulfillment-oriented Assortment and Inventory Allocation",
+  "created_date": "2026-06-26",
+  "source_document": "doc/plan/FAIA_implementation_plan.md",
+  "background": {
+    "summary": "本项目面向即时零售 RDC-FDC 两级仓网履约优化场景。RDC 是区域级大仓，SKU 全、容量大，但离用户远；FDC 是前置仓，离用户近、配送快，但容量有限。项目需要解决两个核心问题：每个 FDC 应该放哪些 SKU，以及选好 SKU 后 RDC 每天应该给各 FDC 分配多少库存。",
+    "business_context": [
+      "用户下单后，系统优先从对应 FDC 本地履约。",
+      "如果 FDC 缺货或未经营相关 SKU，则由 RDC 代履约。",
+      "如果 RDC 也无法满足需求，则产生 lost sales。",
+      "多商品订单只有当订单内所有 SKU 都被 FDC 选中且库存充足时，才能本地完整履约。"
+    ],
+    "main_challenges": [
+      "当前没有真实业务数据，需要先构建合成数据体系。",
+      "FDC 容量有限，不能存放全部 SKU。",
+      "订单存在多商品共购结构，不能只按单品销量选品。",
+      "RDC 既要给 FDC 补货，也要保留库存履约自身需求和兜底需求。",
+      "库存分配存在 lead time、在途库存、多周期状态递推和需求不确定性。",
+      "项目需要能评估、复现、比较 baseline、启发式算法和后续模型。"
+    ]
+  },
+  "big_goal": {
+    "summary": "从 0 实现一套完整的 FAIA 原型系统，形成数据构建、业务仿真、前置仓选品、库存分配、评估实验和工程化复现的完整闭环。",
+    "target_pipeline": [
+      "data",
+      "simulation",
+      "assortment",
+      "inventory",
+      "evaluation",
+      "engineering"
+    ],
+    "success_definition": [
+      "能够生成可控、可复现的合成业务数据。",
+      "能够模拟 RDC-FDC 调拨、履约、缺货和库存状态更新。",
+      "能够运行 Top-K、Reverse-Exclude、Hybrid Selection 等选品策略。",
+      "能够运行基础库存分配策略并输出调拨建议。",
+      "能够通过统一指标比较不同选品和库存策略。",
+      "能够通过版本字段和 manifest 复现实验。"
+    ],
+    "completed": false,
+    "completed_work": []
+  },
+  "directory_strategy": {
+    "summary": "项目按照阶段建立根目录下的独立模块目录，避免配置、代码、运行结果散落。",
+    "top_level_directories": [
+      {
+        "path": "doc/",
+        "purpose": "存放项目文档、论文材料、计划方案。"
+      },
+      {
+        "path": "data/",
+        "purpose": "第一阶段数据体系建设。"
+      },
+      {
+        "path": "simulation/",
+        "purpose": "第二阶段业务仿真环境建设。"
+      },
+      {
+        "path": "assortment/",
+        "purpose": "第三阶段前置仓选品系统建设。"
+      },
+      {
+        "path": "inventory/",
+        "purpose": "第四阶段库存分配系统建设。"
+      },
+      {
+        "path": "evaluation/",
+        "purpose": "第五阶段评估与实验系统建设。"
+      }
+    ]
+  },
+  "phases": [
+    {
+      "phase_id": 1,
+      "name": "数据体系建设",
+      "directory": "data/",
+      "small_goal": "构建一套可用于训练、仿真和评估的合成数据体系，先造出一个可控、可复现、能支撑后续选品和库存仿真的虚拟业务世界。",
+      "completed": true,
+      "completed_work": [
+        {
+          "date": "2026-06-26",
+          "summary": "创建 data/ 目录骨架，建立第一阶段数据体系的独立模块目录。",
+          "outputs": [
+            "data/configs/",
+            "data/schemas/",
+            "data/raw/",
+            "data/synthetic/",
+            "data/processed/",
+            "data/features/",
+            "data/splits/",
+            "data/validation/reports/",
+            "data/scripts/"
+          ]
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "编写数据模块说明，明确目录职责、数据生成流程、版本规则和后续模块读取约定。",
+          "outputs": [
+            "data/README.md"
+          ]
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "定义 small 和 medium 两套合成数据生成配置，覆盖业务规模、订单规模、促销、库存、成本、切分和校验参数。",
+          "outputs": [
+            "data/configs/synthetic_small.yaml",
+            "data/configs/synthetic_medium.yaml"
+          ]
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "设计第一版核心数据 schema，覆盖商品、仓网、可履约关系、日历、促销、订单、库存、调拨、缺货和成本配置。",
+          "outputs": [
+            "data/schemas/sku_master.schema.yaml",
+            "data/schemas/warehouse_master.schema.yaml",
+            "data/schemas/sku_fdc_eligibility.schema.yaml",
+            "data/schemas/calendar.schema.yaml",
+            "data/schemas/promotion_plan.schema.yaml",
+            "data/schemas/orders.schema.yaml",
+            "data/schemas/order_items.schema.yaml",
+            "data/schemas/inventory_snapshot.schema.yaml",
+            "data/schemas/transfer_plan.schema.yaml",
+            "data/schemas/stockout_events.schema.yaml",
+            "data/schemas/cost_config.schema.yaml"
+          ]
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 v001 合成业务世界生成，包含 SKU 池、RDC/FDC 仓网和 SKU-FDC 可履约关系。",
+          "outputs": [
+            "data/scripts/generate_synthetic_data.py",
+            "data/synthetic/v001/sku_master.csv",
+            "data/synthetic/v001/warehouse_master.csv",
+            "data/synthetic/v001/sku_fdc_eligibility.csv",
+            "data/synthetic/v001/manifest.yaml"
+          ],
+          "metrics": {
+            "sku_master_rows": 3000,
+            "warehouse_master_rows": 14,
+            "sku_fdc_eligibility_rows": 36000
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 v001 需求与订单数据生成，模拟长尾 SKU 热度、FDC 区域偏好、多商品订单和共购结构。",
+          "outputs": [
+            "data/synthetic/v001/orders.csv",
+            "data/synthetic/v001/order_items.csv"
+          ],
+          "metrics": {
+            "orders_rows": 1234855,
+            "order_items_rows": 1856325,
+            "fdc_date_order_cells": 2160,
+            "fdc_sku_date_demand_cells": 624438
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 v001 日历与促销计划生成，促销表只包含计划折扣、计划曝光和计划需求提升，不写入未来真实销量。",
+          "outputs": [
+            "data/synthetic/v001/calendar.csv",
+            "data/synthetic/v001/promotion_plan.csv"
+          ],
+          "metrics": {
+            "calendar_rows": 180,
+            "promotion_plan_rows": 1948
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 v001 库存、调拨、缺货和成本数据生成，为第二阶段业务仿真预留可回放接口。",
+          "outputs": [
+            "data/synthetic/v001/inventory_snapshot.csv",
+            "data/synthetic/v001/transfer_plan.csv",
+            "data/synthetic/v001/stockout_events.csv",
+            "data/synthetic/v001/cost_config.csv"
+          ],
+          "metrics": {
+            "inventory_snapshot_rows": 4235400,
+            "transfer_plan_rows": 51691,
+            "stockout_events_rows": 2290830,
+            "cost_config_rows": 4
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 v001 processed 中间表构建，将原始订单、库存、调拨相关数据加工成算法和仿真可直接读取的表。",
+          "outputs": [
+            "data/scripts/build_stage1_artifacts.py",
+            "data/processed/v001/fdc_sku_daily_demand.csv",
+            "data/processed/v001/order_type_table.csv",
+            "data/processed/v001/order_type_items.csv",
+            "data/processed/v001/inventory_daily_state.csv",
+            "data/processed/v001/candidate_pool_base.csv",
+            "data/processed/v001/manifest.yaml"
+          ],
+          "metrics": {
+            "fdc_sku_daily_demand": 624438,
+            "order_type_table": 274420,
+            "order_type_items": 695935,
+            "inventory_daily_state": 4235400,
+            "candidate_pool_base": 32734
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 v001 特征产物构建，为 ML-Top-K 和库存分配预留按 anchor_date 组织的历史需求、未来促销、日历和库存状态特征。",
+          "outputs": [
+            "data/features/ml_topk/v001/fdc_sku_features.csv",
+            "data/features/ml_topk/v001/manifest.yaml",
+            "data/features/inventory/v001/inventory_features.csv",
+            "data/features/inventory/v001/manifest.yaml"
+          ],
+          "metrics": {
+            "ml_topk_fdc_sku_features": 98202,
+            "inventory_features": 52590,
+            "anchor_dates": [
+              "2026-05-06",
+              "2026-06-02",
+              "2026-06-29"
+            ]
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 v001 训练、验证、测试时间切分，按日期顺序切分，避免随机切分导致未来信息泄漏。",
+          "outputs": [
+            "data/splits/v001/train_dates.txt",
+            "data/splits/v001/val_dates.txt",
+            "data/splits/v001/test_dates.txt",
+            "data/splits/v001/manifest.yaml"
+          ],
+          "metrics": {
+            "train_dates": 126,
+            "val_dates": 27,
+            "test_dates": 27,
+            "train_range": [
+              "2026-01-01",
+              "2026-05-06"
+            ],
+            "validation_range": [
+              "2026-05-07",
+              "2026-06-02"
+            ],
+            "test_range": [
+              "2026-06-03",
+              "2026-06-29"
+            ]
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 v001 数据校验，覆盖文件存在性、schema/header、主键、外键、库存非负、候选池合法性、时间切分、manifest 行数一致性和未来信息泄漏边界检查。",
+          "outputs": [
+            "data/scripts/validate_stage1_data.py",
+            "data/validation/reports/v001_validation_report.md",
+            "data/validation/reports/v001_validation_summary.json"
+          ],
+          "metrics": {
+            "overall_status": "PASS",
+            "total_checks": 58,
+            "failed_checks": 0,
+            "warnings": 0
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 v001 数据版本管理，将配置、seed、schema_version、generator_version、各层 manifest、校验报告、产物规模和复现命令登记到版本 manifest。",
+          "outputs": [
+            "data/scripts/register_data_version.py",
+            "data/versions/v001/manifest.yaml",
+            "data/versions/version_registry.yaml",
+            "data/versions/README.md"
+          ],
+          "metrics": {
+            "data_version": "v001",
+            "status": "validated",
+            "config": "data/configs/synthetic_small.yaml",
+            "seed": 20260626,
+            "schema_version": "v001",
+            "generator_version": "v001"
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "第一阶段数据体系建设已完成：v001 数据版本已生成、加工、切分、特征化、校验并完成版本登记。",
+          "outputs": [
+            "data/synthetic/v001/",
+            "data/processed/v001/",
+            "data/features/ml_topk/v001/",
+            "data/features/inventory/v001/",
+            "data/splits/v001/",
+            "data/validation/reports/v001_validation_report.md",
+            "data/versions/v001/manifest.yaml"
+          ],
+          "metrics": {
+            "data_version": "v001",
+            "validation_status": "PASS",
+            "version_status": "validated"
+          }
+        }
+      ],
+      "work_items": [
+        {
+          "item_id": "1.1",
+          "name": "目录规划",
+          "description": "建立 data/ 目录，承载数据生成、schema、raw、synthetic、processed、features、splits、validation、scripts 等内容。",
+          "deliverables": [
+            "data/README.md",
+            "data/configs/",
+            "data/schemas/",
+            "data/raw/",
+            "data/synthetic/",
+            "data/processed/",
+            "data/features/",
+            "data/splits/",
+            "data/validation/",
+            "data/scripts/"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "创建 data/ 目录骨架，并通过 .gitkeep 保留当前尚无数据产物的空目录。",
+              "outputs": [
+                "data/configs/",
+                "data/schemas/",
+                "data/raw/.gitkeep",
+                "data/synthetic/.gitkeep",
+                "data/processed/.gitkeep",
+                "data/features/.gitkeep",
+                "data/splits/.gitkeep",
+                "data/validation/reports/.gitkeep",
+                "data/scripts/.gitkeep"
+              ]
+            },
+            {
+              "date": "2026-06-26",
+              "summary": "编写 data/README.md，说明数据模块目标、目录职责、生成流程、版本规则和模块读取约定。",
+              "outputs": [
+                "data/README.md"
+              ]
+            }
+          ]
+        },
+        {
+          "item_id": "1.2",
+          "name": "明确数据建设范围",
+          "description": "确定第一版模拟业务规模，包括 RDC、FDC、SKU、类目、品牌、模拟天数、订单量、多商品订单比例、促销比例、lead time、FDC 容量和随机种子。",
+          "deliverables": [
+            "data/configs/synthetic_small.yaml",
+            "data/configs/synthetic_medium.yaml"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 small 与 medium 两套数据生成配置。small 用于快速开发和单元测试，medium 用于后续接近真实规模的实验。",
+              "outputs": [
+                "data/configs/synthetic_small.yaml",
+                "data/configs/synthetic_medium.yaml"
+              ]
+            }
+          ]
+        },
+        {
+          "item_id": "1.3",
+          "name": "设计基础数据 schema",
+          "description": "定义核心数据表字段、主键、外键、类型、业务含义和校验规则。",
+          "deliverables": [
+            "sku_master.schema.yaml",
+            "warehouse_master.schema.yaml",
+            "sku_fdc_eligibility.schema.yaml",
+            "calendar.schema.yaml",
+            "promotion_plan.schema.yaml",
+            "orders.schema.yaml",
+            "order_items.schema.yaml",
+            "inventory_snapshot.schema.yaml",
+            "transfer_plan.schema.yaml",
+            "stockout_events.schema.yaml",
+            "cost_config.schema.yaml"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成核心 schema 第一版，定义字段、类型、主键、外键和基础业务约束。",
+              "outputs": [
+                "data/schemas/sku_master.schema.yaml",
+                "data/schemas/warehouse_master.schema.yaml",
+                "data/schemas/sku_fdc_eligibility.schema.yaml",
+                "data/schemas/calendar.schema.yaml",
+                "data/schemas/promotion_plan.schema.yaml",
+                "data/schemas/orders.schema.yaml",
+                "data/schemas/order_items.schema.yaml",
+                "data/schemas/inventory_snapshot.schema.yaml",
+                "data/schemas/transfer_plan.schema.yaml",
+                "data/schemas/stockout_events.schema.yaml",
+                "data/schemas/cost_config.schema.yaml"
+              ]
+            }
+          ]
+        },
+        {
+          "item_id": "1.4",
+          "name": "构建合成业务世界",
+          "description": "生成 SKU 池、RDC/FDC 仓网、SKU-FDC 可履约关系，形成订单、库存和选品问题的业务边界。",
+          "deliverables": [
+            "data/synthetic/v001/sku_master.csv",
+            "data/synthetic/v001/warehouse_master.csv",
+            "data/synthetic/v001/sku_fdc_eligibility.csv"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 v001 合成业务世界生成，包含 SKU 池、RDC/FDC 仓网和 SKU-FDC 可履约关系。",
+              "outputs": [
+                "data/scripts/generate_synthetic_data.py",
+                "data/synthetic/v001/sku_master.csv",
+                "data/synthetic/v001/warehouse_master.csv",
+                "data/synthetic/v001/sku_fdc_eligibility.csv",
+                "data/synthetic/v001/manifest.yaml"
+              ],
+              "metrics": {
+                "sku_master_rows": 3000,
+                "warehouse_master_rows": 14,
+                "sku_fdc_eligibility_rows": 36000
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "1.5",
+          "name": "生成需求与订单数据",
+          "description": "模拟 SKU 热度长尾、区域偏好、类目品牌偏好、商品共购、单品订单、多商品订单、节假日和促销需求冲击。",
+          "deliverables": [
+            "data/synthetic/v001/orders.csv",
+            "data/synthetic/v001/order_items.csv"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 v001 需求与订单数据生成，模拟长尾 SKU 热度、FDC 区域偏好、多商品订单和共购结构。",
+              "outputs": [
+                "data/synthetic/v001/orders.csv",
+                "data/synthetic/v001/order_items.csv"
+              ],
+              "metrics": {
+                "orders_rows": 1234855,
+                "order_items_rows": 1856325,
+                "fdc_date_order_cells": 2160,
+                "fdc_sku_date_demand_cells": 624438
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "1.6",
+          "name": "生成促销与日历数据",
+          "description": "生成 calendar 和 promotion_plan，保证促销特征是预测时点已知的计划数据，而不是未来真实结果。",
+          "deliverables": [
+            "data/synthetic/v001/calendar.csv",
+            "data/synthetic/v001/promotion_plan.csv"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 v001 日历与促销计划生成，促销表只包含计划折扣、计划曝光和计划需求提升，不写入未来真实销量。",
+              "outputs": [
+                "data/synthetic/v001/calendar.csv",
+                "data/synthetic/v001/promotion_plan.csv"
+              ],
+              "metrics": {
+                "calendar_rows": 180,
+                "promotion_plan_rows": 1948
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "1.7",
+          "name": "生成库存、缺货、调拨和成本数据",
+          "description": "生成 RDC/FDC 初始库存、每日库存快照、简单调拨记录、stockout flag 和成本配置，为仿真阶段预留接口。",
+          "deliverables": [
+            "data/synthetic/v001/inventory_snapshot.csv",
+            "data/synthetic/v001/transfer_plan.csv",
+            "data/synthetic/v001/stockout_events.csv",
+            "data/synthetic/v001/cost_config.csv"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 v001 库存、调拨、缺货和成本数据生成，为第二阶段业务仿真预留可回放接口。",
+              "outputs": [
+                "data/synthetic/v001/inventory_snapshot.csv",
+                "data/synthetic/v001/transfer_plan.csv",
+                "data/synthetic/v001/stockout_events.csv",
+                "data/synthetic/v001/cost_config.csv"
+              ],
+              "metrics": {
+                "inventory_snapshot_rows": 4235400,
+                "transfer_plan_rows": 51691,
+                "stockout_events_rows": 2290830,
+                "cost_config_rows": 4
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "1.8",
+          "name": "构建 processed 中间表",
+          "description": "将原始订单、库存、调拨数据加工成算法和仿真可直接使用的中间表。",
+          "deliverables": [
+            "data/processed/v001/fdc_sku_daily_demand.csv",
+            "data/processed/v001/order_type_table.csv",
+            "data/processed/v001/order_type_items.csv",
+            "data/processed/v001/inventory_daily_state.csv",
+            "data/processed/v001/candidate_pool_base.csv"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 v001 processed 中间表构建，将原始订单、库存、调拨相关数据加工成算法和仿真可直接读取的表。",
+              "outputs": [
+                "data/scripts/build_stage1_artifacts.py",
+                "data/processed/v001/fdc_sku_daily_demand.csv",
+                "data/processed/v001/order_type_table.csv",
+                "data/processed/v001/order_type_items.csv",
+                "data/processed/v001/inventory_daily_state.csv",
+                "data/processed/v001/candidate_pool_base.csv",
+                "data/processed/v001/manifest.yaml"
+              ],
+              "metrics": {
+                "fdc_sku_daily_demand": 624438,
+                "order_type_table": 274420,
+                "order_type_items": 695935,
+                "inventory_daily_state": 4235400,
+                "candidate_pool_base": 32734
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "1.9",
+          "name": "构建 features 特征产物",
+          "description": "为 ML-Top-K 和库存分配预留特征产物，包括历史窗口、未来促销、日历和静态特征 key。",
+          "deliverables": [
+            "data/features/ml_topk/v001/",
+            "data/features/inventory/v001/"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 v001 特征产物构建，为 ML-Top-K 和库存分配预留按 anchor_date 组织的历史需求、未来促销、日历和库存状态特征。",
+              "outputs": [
+                "data/features/ml_topk/v001/fdc_sku_features.csv",
+                "data/features/ml_topk/v001/manifest.yaml",
+                "data/features/inventory/v001/inventory_features.csv",
+                "data/features/inventory/v001/manifest.yaml"
+              ],
+              "metrics": {
+                "ml_topk_fdc_sku_features": 98202,
+                "inventory_features": 52590,
+                "anchor_dates": [
+                  "2026-05-06",
+                  "2026-06-02",
+                  "2026-06-29"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "1.10",
+          "name": "构建训练 / 验证 / 测试时间切分",
+          "description": "按时间顺序切分 train、validation、test，避免未来信息泄漏。",
+          "deliverables": [
+            "data/splits/v001/train_dates.txt",
+            "data/splits/v001/val_dates.txt",
+            "data/splits/v001/test_dates.txt"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 v001 训练、验证、测试时间切分，按日期顺序切分，避免随机切分导致未来信息泄漏。",
+              "outputs": [
+                "data/splits/v001/train_dates.txt",
+                "data/splits/v001/val_dates.txt",
+                "data/splits/v001/test_dates.txt",
+                "data/splits/v001/manifest.yaml"
+              ],
+              "metrics": {
+                "train_dates": 126,
+                "val_dates": 27,
+                "test_dates": 27,
+                "train_range": [
+                  "2026-01-01",
+                  "2026-05-06"
+                ],
+                "validation_range": [
+                  "2026-05-07",
+                  "2026-06-02"
+                ],
+                "test_range": [
+                  "2026-06-03",
+                  "2026-06-29"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "1.11",
+          "name": "做数据校验",
+          "description": "校验字段、主键、外键、库存非负、日期范围、候选池合法性、时间切分和未来信息泄漏。",
+          "deliverables": [
+            "data/validation/reports/v001_validation_report.md"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 v001 数据校验，覆盖文件存在性、schema/header、主键、外键、库存非负、候选池合法性、时间切分、manifest 行数一致性和未来信息泄漏边界检查。",
+              "outputs": [
+                "data/scripts/validate_stage1_data.py",
+                "data/validation/reports/v001_validation_report.md",
+                "data/validation/reports/v001_validation_summary.json"
+              ],
+              "metrics": {
+                "overall_status": "PASS",
+                "total_checks": 58,
+                "failed_checks": 0,
+                "warnings": 0
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "1.12",
+          "name": "建立数据版本管理",
+          "description": "为每次数据生成记录 data_version、seed、config、schema_version、generator_version 和规模统计。",
+          "deliverables": [
+            "data/synthetic/v001/manifest.yaml"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成 v001 数据版本管理，将配置、seed、schema_version、generator_version、各层 manifest、校验报告、产物规模和复现命令登记到版本 manifest。",
+              "outputs": [
+                "data/scripts/register_data_version.py",
+                "data/versions/v001/manifest.yaml",
+                "data/versions/version_registry.yaml",
+                "data/versions/README.md"
+              ],
+              "metrics": {
+                "data_version": "v001",
+                "status": "validated",
+                "config": "data/configs/synthetic_small.yaml",
+                "seed": 20260626,
+                "schema_version": "v001",
+                "generator_version": "v001"
+              }
+            }
+          ]
+        }
+      ],
+      "completion_criteria": [
+        "数据能稳定生成。",
+        "schema 清楚。",
+        "数据能按版本复现。",
+        "训练 / 验证 / 测试能按时间切分。",
+        "processed 中间表能支撑 Top-K / Reverse-Exclude。",
+        "features 目录能支撑后续 ML-Top-K 和库存分配模型。",
+        "库存、调拨、成本数据能支撑仿真器读取。",
+        "数据校验报告无严重错误。",
+        "没有明显未来信息泄漏。"
+      ]
+    },
+    {
+      "phase_id": 2,
+      "name": "业务仿真环境建设",
+      "directory": "simulation/",
+      "small_goal": "实现一个可以模拟真实 RDC-FDC 履约过程的业务仿真器，用来评估选品结果和库存策略的实际业务效果。",
+      "completed": false,
+      "completed_work": [
+        {
+          "date": "2026-06-26",
+          "summary": "完成仿真器定位与边界说明，明确 simulation 模块保持策略无关，统一回放调拨、履约、缺货、成本和指标。",
+          "outputs": [
+            "simulation/README.md"
+          ],
+          "metrics": {
+            "scope": "strategy_agnostic_business_replay",
+            "input_data_version_target": "v001",
+            "main_outputs": [
+              "daily_state",
+              "transfer_result",
+              "fulfillment_result",
+              "cost_result",
+              "metrics_summary"
+            ]
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "创建 simulation/ 目录骨架，按第二阶段边界组织配置、schema、规则、策略、源码、脚本、测试、运行结果和报告。",
+          "outputs": [
+            "simulation/configs/",
+            "simulation/schemas/",
+            "simulation/rules/",
+            "simulation/policies/",
+            "simulation/src/",
+            "simulation/scripts/",
+            "simulation/tests/",
+            "simulation/runs/",
+            "simulation/reports/"
+          ],
+          "metrics": {
+            "directory_count": 9
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成第一版仿真输入与输出契约，定义 daily_state、transfer_result、fulfillment_result、cost_result 和 metrics_summary schema。",
+          "outputs": [
+            "simulation/schemas/daily_state.schema.yaml",
+            "simulation/schemas/transfer_result.schema.yaml",
+            "simulation/schemas/fulfillment_result.schema.yaml",
+            "simulation/schemas/cost_result.schema.yaml",
+            "simulation/schemas/metrics_summary.schema.yaml"
+          ],
+          "metrics": {
+            "schema_count": 5
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成核心状态变量定义，建立 SimulationContext、SimulationState、TransferEvent、FulfillmentRecord 以及 RDC/FDC 库存、pipeline、调拨和履约状态口径。",
+          "outputs": [
+            "simulation/src/__init__.py",
+            "simulation/src/state.py"
+          ],
+          "metrics": {
+            "state_structures": [
+              "SimulationContext",
+              "SimulationState",
+              "TransferEvent",
+              "FulfillmentRecord"
+            ],
+            "state_fields": [
+              "rdc_on_hand_inventory",
+              "fdc_on_hand_inventory",
+              "pipeline_inventory",
+              "last_transfer_qty",
+              "last_fulfillment_result",
+              "lost_sales_state"
+            ]
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成仿真初始化实现，可从 simulation 配置读取 data_version v001，构建 SimulationContext，并从 inventory_daily_state 与 transfer_plan 初始化库存状态和未到货 pipeline。",
+          "outputs": [
+            "simulation/configs/simulation_small.yaml",
+            "simulation/configs/simulation_default.yaml",
+            "simulation/rules/simulation_rule_v001.yaml",
+            "simulation/src/initialization.py",
+            "simulation/scripts/check_initialization.py"
+          ],
+          "metrics": {
+            "experiment_id": "sim_smoke_v001_no_transfer",
+            "data_version": "v001",
+            "simulation_start_date": "2026-06-03",
+            "simulation_end_date": "2026-06-29",
+            "initial_inventory_date": "2026-06-02",
+            "fdc_count": 12,
+            "candidate_pair_count": 32734,
+            "rdc_inventory_cells": 6000,
+            "fdc_inventory_cells": 17530,
+            "initial_inventory_rows": 23530,
+            "initial_pipeline_events": 52,
+            "initial_pipeline_qty": 103
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成调拨到货与 lead time 基础逻辑，实现 arrival_date 计算、TransferEvent 构造、pipeline 入队、当日到货入库和 lead time 一致性校验。",
+          "outputs": [
+            "simulation/src/allocation.py",
+            "simulation/src/state.py"
+          ],
+          "metrics": {
+            "first_arrival_date_checked": "2026-06-03",
+            "arrival_events_checked": 29,
+            "arrival_qty_checked": 57,
+            "fdc_inventory_delta_checked": 57,
+            "manual_lead_time_check": {
+              "ship_date": "2026-06-03",
+              "lead_time_days": 2,
+              "arrival_date": "2026-06-05"
+            }
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成策略接口与 baseline 策略配置，定义 TransferDecision 和 TransferPolicy，并实现 NoTransferPolicy、HistoricalMeanPolicy、BaseStockPolicy 的第一版接口。",
+          "outputs": [
+            "simulation/src/policy.py",
+            "simulation/policies/no_transfer.yaml",
+            "simulation/policies/historical_mean.yaml",
+            "simulation/policies/base_stock.yaml",
+            "simulation/scripts/check_policy_allocation.py"
+          ],
+          "metrics": {
+            "policy_count": 3,
+            "policies": [
+              "no_transfer_v001",
+              "historical_mean_v001",
+              "base_stock_v001"
+            ],
+            "smoke_policy_version": "no_transfer_v001",
+            "smoke_policy_decision_count": 0
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成调拨分配与硬约束裁剪逻辑，支持 SKU-FDC 候选池校验、RDC 库存裁剪、FDC 容量检查、lead time 到货日计算和实际调拨入 pipeline。",
+          "outputs": [
+            "simulation/src/allocation.py",
+            "simulation/src/state.py",
+            "simulation/rules/simulation_rule_v001.yaml",
+            "simulation/scripts/check_policy_allocation.py"
+          ],
+          "metrics": {
+            "manual_clip_check": {
+              "recommended_transfer_qty": 9,
+              "actual_transfer_qty": 4,
+              "clipped_qty": 5,
+              "clip_reason": "rdc_inventory_limit",
+              "arrival_date": "2026-06-05",
+              "rdc_stock_before": 4,
+              "rdc_stock_after": 0
+            },
+            "invalid_pair_check": {
+              "actual_transfer_qty": 0,
+              "clip_reason": "not_in_candidate_pool",
+              "status": "cancelled"
+            }
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成履约仿真逻辑，实现 FDC 本地优先履约、RDC fallback 代履约和 lost sales 计算，并在履约后同步扣减库存和记录 FulfillmentRecord。",
+          "outputs": [
+            "simulation/src/fulfillment.py",
+            "simulation/scripts/check_fulfillment.py",
+            "simulation/README.md"
+          ],
+          "metrics": {
+            "smoke_simulation_date": "2026-06-03",
+            "demand_cells": 3997,
+            "fulfillment_records": 3997,
+            "arrival_events": 29,
+            "arrival_qty": 57,
+            "demand_qty": 12054,
+            "fdc_fulfilled_qty": 82,
+            "rdc_fallback_qty": 868,
+            "lost_sales_qty": 11104,
+            "demand_conservation_ok": true,
+            "fdc_inventory_consumed": 82,
+            "rdc_inventory_consumed": 868,
+            "lost_sales_cells": 3424
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成成本和指标计算逻辑，实现 cost_config 读取、transfer/fallback/lost/holding 成本计算，以及 FDC Fulfillment Rate、Loss Ratio、总需求、履约量和总成本汇总。",
+          "outputs": [
+            "simulation/src/cost.py",
+            "simulation/src/metrics.py",
+            "simulation/scripts/check_cost_metrics.py",
+            "simulation/README.md"
+          ],
+          "metrics": {
+            "smoke_simulation_date": "2026-06-03",
+            "demand_qty": 12054,
+            "fdc_fulfilled_qty": 82,
+            "rdc_fallback_qty": 868,
+            "lost_sales_qty": 11104,
+            "cost_record_count": 7623,
+            "transfer_cost": 0.0,
+            "rdc_fallback_cost": 1041.6,
+            "lost_sales_cost": 55520.0,
+            "holding_cost": 598.77,
+            "total_cost": 57160.37,
+            "fdc_fulfillment_rate": 0.00680272,
+            "loss_ratio": 0.92118799
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成仿真输出与复盘日志，实现完整多日 simulation run，输出 daily_state、transfer_result、fulfillment_result、cost_result、metrics_summary、daily_log、simulation_config、simulation_manifest 和复盘报告。",
+          "outputs": [
+            "simulation/src/engine.py",
+            "simulation/scripts/run_simulation.py",
+            "simulation/runs/sim_smoke_v001_no_transfer/daily_state.csv",
+            "simulation/runs/sim_smoke_v001_no_transfer/transfer_result.csv",
+            "simulation/runs/sim_smoke_v001_no_transfer/fulfillment_result.csv",
+            "simulation/runs/sim_smoke_v001_no_transfer/cost_result.csv",
+            "simulation/runs/sim_smoke_v001_no_transfer/metrics_summary.json",
+            "simulation/runs/sim_smoke_v001_no_transfer/daily_log.json",
+            "simulation/runs/sim_smoke_v001_no_transfer/simulation_config.yaml",
+            "simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml",
+            "simulation/reports/sim_smoke_v001_no_transfer_simulation_report.md"
+          ],
+          "metrics": {
+            "experiment_id": "sim_smoke_v001_no_transfer",
+            "data_version": "v001",
+            "policy_version": "no_transfer_v001",
+            "simulation_rule_version": "sim_rule_v001",
+            "simulation_start_date": "2026-06-03",
+            "simulation_end_date": "2026-06-29",
+            "row_counts": {
+              "daily_state": 635310,
+              "transfer_result": 0,
+              "fulfillment_result": 99442,
+              "cost_result": 179390
+            },
+            "total_demand_qty": 298426,
+            "fdc_fulfilled_qty": 994,
+            "rdc_fallback_qty": 13669,
+            "lost_sales_qty": 283763,
+            "fdc_fulfillment_rate": 0.00333081,
+            "loss_ratio": 0.95086554,
+            "total_cost": 1444164.58
+          }
+        }
+      ],
+      "work_items": [
+        {
+          "item_id": "2.1",
+          "name": "明确仿真器定位与边界",
+          "description": "保持仿真器策略无关，统一回放调拨、履约、缺货和成本结果。",
+          "deliverables": [
+            "simulation/README.md 中的定位说明"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成仿真器定位与边界说明，明确 simulation 模块保持策略无关，统一回放调拨、履约、缺货、成本和指标。",
+              "outputs": [
+                "simulation/README.md"
+              ],
+              "metrics": {
+                "scope": "strategy_agnostic_business_replay",
+                "input_data_version_target": "v001",
+                "main_outputs": [
+                  "daily_state",
+                  "transfer_result",
+                  "fulfillment_result",
+                  "cost_result",
+                  "metrics_summary"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.2",
+          "name": "目录与模块规划",
+          "description": "建立 simulation/ 目录，包含 configs、schemas、rules、policies、src、scripts、tests、runs、reports。",
+          "deliverables": [
+            "simulation/configs/",
+            "simulation/schemas/",
+            "simulation/rules/",
+            "simulation/policies/",
+            "simulation/src/",
+            "simulation/scripts/",
+            "simulation/tests/",
+            "simulation/runs/",
+            "simulation/reports/"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "创建 simulation/ 目录骨架，按第二阶段边界组织配置、schema、规则、策略、源码、脚本、测试、运行结果和报告。",
+              "outputs": [
+                "simulation/configs/",
+                "simulation/schemas/",
+                "simulation/rules/",
+                "simulation/policies/",
+                "simulation/src/",
+                "simulation/scripts/",
+                "simulation/tests/",
+                "simulation/runs/",
+                "simulation/reports/"
+              ],
+              "metrics": {
+                "directory_count": 9
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.3",
+          "name": "定义仿真输入与输出契约",
+          "description": "明确仿真器读取哪些数据表、策略输出和成本配置，以及输出哪些仿真结果表。",
+          "deliverables": [
+            "daily_state schema",
+            "transfer_result schema",
+            "fulfillment_result schema",
+            "cost_result schema",
+            "metrics_summary schema"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成第一版仿真输入与输出契约，定义 daily_state、transfer_result、fulfillment_result、cost_result 和 metrics_summary schema。",
+              "outputs": [
+                "simulation/schemas/daily_state.schema.yaml",
+                "simulation/schemas/transfer_result.schema.yaml",
+                "simulation/schemas/fulfillment_result.schema.yaml",
+                "simulation/schemas/cost_result.schema.yaml",
+                "simulation/schemas/metrics_summary.schema.yaml"
+              ],
+              "metrics": {
+                "schema_count": 5
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.4",
+          "name": "定义核心状态变量",
+          "description": "设计 RDC/FDC on-hand 库存、pipeline_inventory、last_transfer_qty、履约结果和 lost_sales_state。",
+          "deliverables": [
+            "simulation/src/state.py"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成核心状态变量定义，建立 SimulationContext、SimulationState、TransferEvent、FulfillmentRecord 以及 RDC/FDC 库存、pipeline、调拨和履约状态口径。",
+              "outputs": [
+                "simulation/src/__init__.py",
+                "simulation/src/state.py"
+              ],
+              "metrics": {
+                "state_structures": [
+                  "SimulationContext",
+                  "SimulationState",
+                  "TransferEvent",
+                  "FulfillmentRecord"
+                ],
+                "state_fields": [
+                  "rdc_on_hand_inventory",
+                  "fdc_on_hand_inventory",
+                  "pipeline_inventory",
+                  "last_transfer_qty",
+                  "last_fulfillment_result",
+                  "lost_sales_state"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.5",
+          "name": "实现仿真初始化",
+          "description": "根据仿真日期、初始库存、在途库存、仓网、选品结果和成本配置初始化 SimulationState。",
+          "deliverables": [
+            "initial_simulation_state",
+            "simulation_context"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成仿真初始化实现，可从 simulation 配置读取 data_version v001，构建 SimulationContext，并从 inventory_daily_state 与 transfer_plan 初始化库存状态和未到货 pipeline。",
+              "outputs": [
+                "simulation/configs/simulation_small.yaml",
+                "simulation/configs/simulation_default.yaml",
+                "simulation/rules/simulation_rule_v001.yaml",
+                "simulation/src/initialization.py",
+                "simulation/scripts/check_initialization.py"
+              ],
+              "metrics": {
+                "experiment_id": "sim_smoke_v001_no_transfer",
+                "data_version": "v001",
+                "simulation_start_date": "2026-06-03",
+                "simulation_end_date": "2026-06-29",
+                "initial_inventory_date": "2026-06-02",
+                "fdc_count": 12,
+                "candidate_pair_count": 32734,
+                "rdc_inventory_cells": 6000,
+                "fdc_inventory_cells": 17530,
+                "initial_inventory_rows": 23530,
+                "initial_pipeline_events": 52,
+                "initial_pipeline_qty": 103
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.6",
+          "name": "实现调拨到货与 lead time 逻辑",
+          "description": "实现 ArrivalUpdate、PipelineShift、TransferPipelineUpdate，确保调拨按 lead time 到货。",
+          "deliverables": [
+            "simulation/src/allocation.py 中的 pipeline 逻辑"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成调拨到货与 lead time 基础逻辑，实现 arrival_date 计算、TransferEvent 构造、pipeline 入队、当日到货入库和 lead time 一致性校验。",
+              "outputs": [
+                "simulation/src/allocation.py",
+                "simulation/src/state.py"
+              ],
+              "metrics": {
+                "first_arrival_date_checked": "2026-06-03",
+                "arrival_events_checked": 29,
+                "arrival_qty_checked": 57,
+                "fdc_inventory_delta_checked": 57,
+                "manual_lead_time_check": {
+                  "ship_date": "2026-06-03",
+                  "lead_time_days": 2,
+                  "arrival_date": "2026-06-05"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.7",
+          "name": "实现策略接口",
+          "description": "支持 transfer_qty 策略和 TI/SS 策略，先实现 NoTransferPolicy、HistoricalMeanPolicy、BaseStockPolicy。",
+          "deliverables": [
+            "simulation/src/policy.py",
+            "simulation/policies/no_transfer.yaml",
+            "simulation/policies/historical_mean.yaml",
+            "simulation/policies/base_stock.yaml"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成策略接口与 baseline 策略配置，定义 TransferDecision 和 TransferPolicy，并实现 NoTransferPolicy、HistoricalMeanPolicy、BaseStockPolicy 的第一版接口。",
+              "outputs": [
+                "simulation/src/policy.py",
+                "simulation/policies/no_transfer.yaml",
+                "simulation/policies/historical_mean.yaml",
+                "simulation/policies/base_stock.yaml",
+                "simulation/scripts/check_policy_allocation.py"
+              ],
+              "metrics": {
+                "policy_count": 3,
+                "policies": [
+                  "no_transfer_v001",
+                  "historical_mean_v001",
+                  "base_stock_v001"
+                ],
+                "smoke_policy_version": "no_transfer_v001",
+                "smoke_policy_decision_count": 0
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.8",
+          "name": "实现调拨分配与硬约束裁剪",
+          "description": "根据 SKU-FDC 合法性、RDC 可用库存、FDC 容量、收货能力和出库能力裁剪建议调拨量。",
+          "deliverables": [
+            "actual_transfer_qty 计算逻辑"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成调拨分配与硬约束裁剪逻辑，支持 SKU-FDC 候选池校验、RDC 库存裁剪、FDC 容量检查、lead time 到货日计算和实际调拨入 pipeline。",
+              "outputs": [
+                "simulation/src/allocation.py",
+                "simulation/src/state.py",
+                "simulation/rules/simulation_rule_v001.yaml",
+                "simulation/scripts/check_policy_allocation.py"
+              ],
+              "metrics": {
+                "manual_clip_check": {
+                  "recommended_transfer_qty": 9,
+                  "actual_transfer_qty": 4,
+                  "clipped_qty": 5,
+                  "clip_reason": "rdc_inventory_limit",
+                  "arrival_date": "2026-06-05",
+                  "rdc_stock_before": 4,
+                  "rdc_stock_after": 0
+                },
+                "invalid_pair_check": {
+                  "actual_transfer_qty": 0,
+                  "clip_reason": "not_in_candidate_pool",
+                  "status": "cancelled"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.9",
+          "name": "实现履约仿真逻辑",
+          "description": "模拟 FDC 本地履约、RDC 代履约、RDC 自身履约和 lost sales。",
+          "deliverables": [
+            "simulation/src/fulfillment.py"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成履约仿真逻辑，实现 FDC 本地优先履约、RDC fallback 代履约和 lost sales 计算，并在履约后同步扣减库存和记录 FulfillmentRecord。",
+              "outputs": [
+                "simulation/src/fulfillment.py",
+                "simulation/scripts/check_fulfillment.py",
+                "simulation/README.md"
+              ],
+              "metrics": {
+                "smoke_simulation_date": "2026-06-03",
+                "demand_cells": 3997,
+                "fulfillment_records": 3997,
+                "arrival_events": 29,
+                "arrival_qty": 57,
+                "demand_qty": 12054,
+                "fdc_fulfilled_qty": 82,
+                "rdc_fallback_qty": 868,
+                "lost_sales_qty": 11104,
+                "demand_conservation_ok": true,
+                "fdc_inventory_consumed": 82,
+                "rdc_inventory_consumed": 868,
+                "lost_sales_cells": 3424
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.10",
+          "name": "实现成本和指标计算",
+          "description": "计算 transfer_cost、rdc_fallback_cost、lost_sales_cost、holding_cost 以及 FDC Ful.、Reg. Loss、Loss Ratio 等指标。",
+          "deliverables": [
+            "simulation/src/cost.py",
+            "simulation/src/metrics.py"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成成本和指标计算逻辑，实现 cost_config 读取、transfer/fallback/lost/holding 成本计算，以及 FDC Fulfillment Rate、Loss Ratio、总需求、履约量和总成本汇总。",
+              "outputs": [
+                "simulation/src/cost.py",
+                "simulation/src/metrics.py",
+                "simulation/scripts/check_cost_metrics.py",
+                "simulation/README.md"
+              ],
+              "metrics": {
+                "smoke_simulation_date": "2026-06-03",
+                "demand_qty": 12054,
+                "fdc_fulfilled_qty": 82,
+                "rdc_fallback_qty": 868,
+                "lost_sales_qty": 11104,
+                "cost_record_count": 7623,
+                "transfer_cost": 0.0,
+                "rdc_fallback_cost": 1041.6,
+                "lost_sales_cost": 55520.0,
+                "holding_cost": 598.77,
+                "total_cost": 57160.37,
+                "fdc_fulfillment_rate": 0.00680272,
+                "loss_ratio": 0.92118799
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.11",
+          "name": "实现仿真输出与复盘日志",
+          "description": "输出 daily_state、transfer_result、fulfillment_result、cost_result、metrics_summary 和 simulation_manifest。",
+          "deliverables": [
+            "simulation/runs/<experiment_id>/"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成仿真输出与复盘日志，实现完整多日 simulation run，输出 daily_state、transfer_result、fulfillment_result、cost_result、metrics_summary、daily_log、simulation_config、simulation_manifest 和复盘报告。",
+              "outputs": [
+                "simulation/src/engine.py",
+                "simulation/scripts/run_simulation.py",
+                "simulation/runs/sim_smoke_v001_no_transfer/daily_state.csv",
+                "simulation/runs/sim_smoke_v001_no_transfer/transfer_result.csv",
+                "simulation/runs/sim_smoke_v001_no_transfer/fulfillment_result.csv",
+                "simulation/runs/sim_smoke_v001_no_transfer/cost_result.csv",
+                "simulation/runs/sim_smoke_v001_no_transfer/metrics_summary.json",
+                "simulation/runs/sim_smoke_v001_no_transfer/daily_log.json",
+                "simulation/runs/sim_smoke_v001_no_transfer/simulation_config.yaml",
+                "simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml",
+                "simulation/reports/sim_smoke_v001_no_transfer_simulation_report.md"
+              ],
+              "metrics": {
+                "experiment_id": "sim_smoke_v001_no_transfer",
+                "data_version": "v001",
+                "policy_version": "no_transfer_v001",
+                "simulation_rule_version": "sim_rule_v001",
+                "simulation_start_date": "2026-06-03",
+                "simulation_end_date": "2026-06-29",
+                "row_counts": {
+                  "daily_state": 635310,
+                  "transfer_result": 0,
+                  "fulfillment_result": 99442,
+                  "cost_result": 179390
+                },
+                "total_demand_qty": 298426,
+                "fdc_fulfilled_qty": 994,
+                "rdc_fallback_qty": 13669,
+                "lost_sales_qty": 283763,
+                "fdc_fulfillment_rate": 0.00333081,
+                "loss_ratio": 0.95086554,
+                "total_cost": 1444164.58
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.12",
+          "name": "实现仿真校验与单元测试",
+          "description": "校验库存守恒、需求守恒、非负库存、lead time、容量约束和不可履约 SKU 调拨。",
+          "deliverables": [
+            "simulation/tests/"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成仿真校验与单元测试，建立核心约束单测和 run 级输出校验，覆盖库存守恒、需求守恒、非负库存、lead time、容量约束、不可履约 SKU 调拨和版本一致性。",
+              "outputs": [
+                "simulation/src/validation.py",
+                "simulation/scripts/validate_simulation_run.py",
+                "simulation/tests/__init__.py",
+                "simulation/tests/test_simulation_invariants.py",
+                "simulation/runs/sim_smoke_v001_no_transfer/validation_summary.json",
+                "simulation/reports/sim_smoke_v001_no_transfer_validation_report.md",
+                "simulation/README.md"
+              ],
+              "metrics": {
+                "unit_tests": 8,
+                "unit_test_status": "passed",
+                "run_validation_status": "passed",
+                "validation_checks": [
+                  "required_files_exist",
+                  "version_lineage_consistent",
+                  "row_counts_match_manifest",
+                  "non_negative_inventory",
+                  "demand_conservation",
+                  "transfer_constraints",
+                  "inventory_conservation"
+                ],
+                "daily_state_rows_checked": 635310,
+                "fulfillment_rows_checked": 99442,
+                "inventory_dates_checked": 27,
+                "inventory_conservation_errors": 0,
+                "total_demand_qty": 298426,
+                "fdc_fulfilled_qty": 994,
+                "rdc_fallback_qty": 13669,
+                "lost_sales_qty": 283763
+              }
+            }
+          ]
+        },
+        {
+          "item_id": "2.13",
+          "name": "建立仿真规则版本管理",
+          "description": "记录 simulation_rule_version、policy_version、data_version、assortment_version 和 experiment_id。",
+          "deliverables": [
+            "simulation_manifest.yaml"
+          ],
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成仿真规则版本管理，在 simulation config、SimulationContext、metrics_summary 和 simulation_manifest 中记录 experiment_id、data_version、assortment_version、policy_version、simulation_rule_version，并新增 version_lineage 与 validation 记录。",
+              "outputs": [
+                "simulation/configs/simulation_small.yaml",
+                "simulation/configs/simulation_default.yaml",
+                "simulation/src/state.py",
+                "simulation/src/initialization.py",
+                "simulation/src/metrics.py",
+                "simulation/src/engine.py",
+                "simulation/schemas/metrics_summary.schema.yaml",
+                "simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml",
+                "simulation/runs/sim_smoke_v001_no_transfer/metrics_summary.json"
+              ],
+              "metrics": {
+                "experiment_id": "sim_smoke_v001_no_transfer",
+                "data_version": "v001",
+                "assortment_version": "assortment_v001",
+                "policy_version": "no_transfer_v001",
+                "simulation_rule_version": "sim_rule_v001",
+                "version_lineage_check": "passed",
+                "manifest_validation_passed": true
+              }
+            }
+          ]
+        }
+      ],
+      "completion_criteria": [
+        "能读取第一阶段生成的数据。",
+        "能初始化 RDC/FDC/SKU 库存状态。",
+        "能处理 lead time 和在途库存。",
+        "能接入至少一种 baseline 调拨策略。",
+        "能模拟 FDC 本地履约、RDC 代履约和 lost sales。",
+        "能跨多天滚动更新库存状态。",
+        "能输出 transfer_result、fulfillment_result、cost_result、daily_state 和 metrics_summary。",
+        "能通过基础库存守恒和需求守恒校验。",
+        "能通过 experiment_id 和 simulation_manifest 复现仿真结果。"
+      ]
+    },
+    {
+      "phase_id": 3,
+      "name": "前置仓选品系统建设",
+      "directory": "assortment/",
+      "small_goal": "根据历史订单结构、候选 SKU 池、FDC 容量约束和未来需求信号，为每个 FDC 生成可执行的 SKU assortment。",
+      "completed": false,
+      "completed_work": [],
+      "work_items": [
+        {
+          "item_id": "3.1",
+          "name": "明确选品系统定位与边界",
+          "description": "选品系统只解决放什么，输出 SKU-FDC 关系，不直接输出库存数量。",
+          "deliverables": [
+            "assortment/README.md 中的定位说明"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.2",
+          "name": "目录与模块规划",
+          "description": "建立 assortment/ 目录，包含 configs、schemas、methods、models、src、scripts、tests、runs、reports。",
+          "deliverables": [
+            "assortment/"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.3",
+          "name": "定义选品输入与输出契约",
+          "description": "明确候选池、K 表、算法结果、最终选品结果和指标表的 schema。",
+          "deliverables": [
+            "candidate_pool.schema.yaml",
+            "k_table.schema.yaml",
+            "assortment_result.schema.yaml",
+            "assortment_metrics.schema.yaml"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.4",
+          "name": "构建候选 SKU 池",
+          "description": "按 fdc_id 和 anchor_date 构建候选池，过滤不可售和不可履约 SKU，保留促销、新品、战略 SKU 和共购结构重要 SKU。",
+          "deliverables": [
+            "assortment/runs/<experiment_id>/candidate_pool.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.5",
+          "name": "计算每个 FDC 的 K 值",
+          "description": "按历史订单覆盖目标和物理容量计算每个 FDC 的选品数量上限。",
+          "deliverables": [
+            "assortment/runs/<experiment_id>/k_table.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.6",
+          "name": "实现 Top-K baseline",
+          "description": "按历史窗口内 SKU 被去重订单包含次数排序，选出前 K 个 SKU。",
+          "deliverables": [
+            "topk_result.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.7",
+          "name": "实现 Reverse-Exclude",
+          "description": "基于订单-SKU 共购结构，从候选全集开始反向删除影响最小的 SKU。",
+          "deliverables": [
+            "reverse_exclude_result.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.8",
+          "name": "实现 Hybrid Selection",
+          "description": "融合 ML-Top-K 或 Top-K 信号与 Reverse-Exclude 共购结构信号。",
+          "deliverables": [
+            "hybrid_result.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.9",
+          "name": "预留并逐步实现 ML-Top-K",
+          "description": "固定 ML-Top-K 输入输出接口，后续从简单模型升级到深度时序模型。",
+          "deliverables": [
+            "assortment/models/ml_topk/",
+            "ml_topk_result.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.10",
+          "name": "实现选品评估器",
+          "description": "计算 local_order_fulfillment_rate@K、SKU_Frequency_Recall@K、NDCG@K 和分层覆盖率。",
+          "deliverables": [
+            "assortment_metrics.json",
+            "assortment_report.md"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.11",
+          "name": "定义选品结果输出与版本管理",
+          "description": "标准化 assortment_result 字段，建立 assortment_manifest 和 assortment_version。",
+          "deliverables": [
+            "assortment_manifest.yaml"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "3.12",
+          "name": "实现选品校验与单元测试",
+          "description": "校验输出 SKU 数量、候选池合法性、rank 连续性、source_tag 合法性和评估窗口无泄漏。",
+          "deliverables": [
+            "assortment/tests/"
+          ],
+          "completed": false,
+          "completed_work": []
+        }
+      ],
+      "completion_criteria": [
+        "能读取 data/processed 和 data/features。",
+        "能为每个 FDC、anchor_date 构建候选 SKU 池。",
+        "能为每个 FDC 计算 K。",
+        "能运行 Top-K baseline、Reverse-Exclude 和 Hybrid Selection。",
+        "能输出标准 assortment_result。",
+        "能计算 local_order_fulfillment_rate@K。",
+        "能比较不同选品方法的效果。",
+        "能通过 assortment_version 被 simulation 阶段读取。",
+        "能通过 assortment_manifest 复现同一次选品实验。"
+      ]
+    },
+    {
+      "phase_id": 4,
+      "name": "库存分配系统建设",
+      "directory": "inventory/",
+      "small_goal": "基于前置仓选品结果、当前库存、在途库存、需求预测、lead time、成本参数和业务约束，生成每日 RDC -> FDC 的库存分配建议。",
+      "completed": false,
+      "completed_work": [],
+      "work_items": [
+        {
+          "item_id": "4.1",
+          "name": "明确库存分配系统定位与边界",
+          "description": "库存分配系统解决放多少，消费 assortment 输出，并依赖 simulation 评估策略效果。",
+          "deliverables": [
+            "inventory/README.md 中的定位说明"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.2",
+          "name": "目录与模块规划",
+          "description": "建立 inventory/ 目录，包含 configs、schemas、policies、models、src、scripts、tests、runs、reports。",
+          "deliverables": [
+            "inventory/"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.3",
+          "name": "定义库存分配输入与输出契约",
+          "description": "固定 inventory_state、demand_forecast、tiss_result、transfer_recommendation 等 schema。",
+          "deliverables": [
+            "inventory_state.schema.yaml",
+            "demand_forecast.schema.yaml",
+            "tiss_result.schema.yaml",
+            "transfer_recommendation.schema.yaml"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.4",
+          "name": "构建库存状态样本",
+          "description": "构建 RDC/FDC on-hand、pipeline、assortment_mask、eligible_mask、lead_time、capacity_state。",
+          "deliverables": [
+            "inventory_state.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.5",
+          "name": "实现需求预测模块",
+          "description": "先实现历史均值、移动平均、季节 naive、促销修正预测 baseline。",
+          "deliverables": [
+            "demand_forecast.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.6",
+          "name": "实现安全库存和目标库存策略",
+          "description": "根据需求预测、lead time、需求波动和预测误差生成 SS 和 TI。",
+          "deliverables": [
+            "tiss_result.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.7",
+          "name": "实现库存分配 baseline 策略",
+          "description": "实现 NoTransfer、HistoricalMeanReplenishment、BaseStock、ParameterSearch、GreedyAllocation。",
+          "deliverables": [
+            "transfer_recommendation.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.8",
+          "name": "实现 RDC 自留库存与 FDC 调拨权衡",
+          "description": "为 RDC 计算保留库存，只允许可调拨库存参与 FDC 补货，并在库存不足时按优先级分配。",
+          "deliverables": [
+            "RDC reserve rule",
+            "priority allocation rule"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.9",
+          "name": "调用 simulation 评估库存策略",
+          "description": "将 transfer_recommendation 接入 simulation 回放，汇总库存策略效果。",
+          "deliverables": [
+            "simulation_metrics.json",
+            "inventory_report.md"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.10",
+          "name": "预留端到端库存分配框架",
+          "description": "固定 ForecastingModule、TISSGenerationModule、SimulationModule、LossComputer 接口。",
+          "deliverables": [
+            "end_to_end interface design"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.11",
+          "name": "定义库存结果输出与版本管理",
+          "description": "标准化 transfer_recommendation 字段，建立 inventory_manifest 和 inventory_version。",
+          "deliverables": [
+            "inventory_manifest.yaml"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "4.12",
+          "name": "实现库存分配校验与单元测试",
+          "description": "校验非负调拨、RDC 可调拨库存、未选品 SKU mask、TI >= SS >= 0、lead time 合法性和未来信息泄漏。",
+          "deliverables": [
+            "inventory/tests/"
+          ],
+          "completed": false,
+          "completed_work": []
+        }
+      ],
+      "completion_criteria": [
+        "能读取 data、assortment 和 simulation 的必要输入。",
+        "能构建 RDC/FDC/SKU 库存状态。",
+        "能生成需求预测 baseline。",
+        "能生成 SS 和 TI。",
+        "能输出 recommended_transfer_qty。",
+        "能处理 RDC 自留库存和 FDC 调拨之间的权衡。",
+        "能运行至少一种库存 baseline 策略。",
+        "能调用 simulation 回放库存策略效果。",
+        "能输出 FDC Ful.、Reg. Loss、Loss Ratio、Transfer Cost 等指标。",
+        "能通过 inventory_manifest 复现同一次库存策略实验。"
+      ]
+    },
+    {
+      "phase_id": 5,
+      "name": "评估与实验系统建设",
+      "directory": "evaluation/",
+      "small_goal": "建立统一实验框架，稳定比较不同阶段、不同算法、不同策略的效果。",
+      "completed": false,
+      "completed_work": [],
+      "work_items": [
+        {
+          "item_id": "5.1",
+          "name": "明确评估系统定位与边界",
+          "description": "评估系统作为统一裁判，读取各阶段产物，按照统一指标和协议比较。",
+          "deliverables": [
+            "evaluation/README.md 中的定位说明"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "5.2",
+          "name": "轻量目录规划",
+          "description": "建立 evaluation/ 目录，承载 configs、schemas、src、scripts、runs、reports。",
+          "deliverables": [
+            "evaluation/"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "5.3",
+          "name": "统一实验协议",
+          "description": "统一 data_version、split_version、assortment_version、simulation_rule_version、cost_config_version 和 evaluation_window。",
+          "deliverables": [
+            "evaluation_default.yaml",
+            "evaluation_manifest.yaml"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "5.4",
+          "name": "统一指标体系",
+          "description": "定义数据层、选品层、库存仿真层和综合对比指标。",
+          "deliverables": [
+            "metrics_summary.schema.yaml"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "5.5",
+          "name": "建立 baseline 对比矩阵",
+          "description": "定义选品方法、库存方法和组合实验的对比矩阵。",
+          "deliverables": [
+            "comparison_table.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "5.6",
+          "name": "实验注册与结果收集",
+          "description": "扫描各阶段 manifest，汇总 experiment_registry 和 metrics_summary。",
+          "deliverables": [
+            "experiment_registry.csv",
+            "metrics_summary.csv"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "5.7",
+          "name": "生成实验报告",
+          "description": "生成包含主指标、分层指标、trade-off、异常分析和结论的评估报告。",
+          "deliverables": [
+            "evaluation_report.md"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "5.8",
+          "name": "评估校验",
+          "description": "校验同一次 evaluation 中版本字段、评估窗口、指标分母和指标完整性是否一致。",
+          "deliverables": [
+            "evaluation validation report"
+          ],
+          "completed": false,
+          "completed_work": []
+        }
+      ],
+      "completion_criteria": [
+        "能收集 data、simulation、assortment、inventory 的 manifest 和指标。",
+        "能生成 experiment_registry。",
+        "能统一输出 metrics_summary。",
+        "能比较选品方法和库存分配方法。",
+        "能输出 baseline 对比报告。",
+        "能识别指标 trade-off。",
+        "能校验实验版本是否可比。",
+        "能通过 evaluation_id 复现一次综合评估。"
+      ]
+    },
+    {
+      "phase_id": 6,
+      "name": "工程化与版本管理",
+      "directory": "project_root",
+      "small_goal": "把前五个阶段统一成稳定工程体系，让项目可运行、可复现、可扩展。",
+      "completed": false,
+      "completed_work": [],
+      "work_items": [
+        {
+          "item_id": "6.1",
+          "name": "项目最终目录口径",
+          "description": "统一 README、pyproject.toml、Makefile、doc、data、simulation、assortment、inventory、evaluation、scripts、configs、tests、artifacts。",
+          "deliverables": [
+            "README.md",
+            "pyproject.toml",
+            "Makefile",
+            "configs/project.yaml"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "6.2",
+          "name": "统一配置管理",
+          "description": "建立全局配置和阶段配置的层级关系，禁止脚本硬编码关键版本和路径。",
+          "deliverables": [
+            "configs/project.yaml"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "6.3",
+          "name": "统一命令入口",
+          "description": "提供 make data、make simulation、make assortment、make inventory、make evaluation、make full、make test 等入口。",
+          "deliverables": [
+            "Makefile",
+            "scripts/run_full_pipeline.py"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "6.4",
+          "name": "版本体系",
+          "description": "统一管理 data_version、feature_version、assortment_version、simulation_rule_version、inventory_version、model_version、evaluation_id、experiment_id。",
+          "deliverables": [
+            "manifest standards"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "6.5",
+          "name": "日志、报告和异常处理",
+          "description": "统一记录输入输出版本、配置、耗时、数据规模、校验错误和报告位置。",
+          "deliverables": [
+            "logging convention",
+            "error handling convention"
+          ],
+          "completed": false,
+          "completed_work": []
+        },
+        {
+          "item_id": "6.6",
+          "name": "测试体系",
+          "description": "建设单元测试、阶段集成测试和跨阶段集成测试。",
+          "deliverables": [
+            "tests/integration/"
+          ],
+          "completed": false,
+          "completed_work": []
+        }
+      ],
+      "completion_criteria": [
+        "项目有清晰 README。",
+        "每个阶段有独立 README。",
+        "每个阶段能独立运行。",
+        "全链路能通过统一命令跑通。",
+        "所有阶段输出 manifest。",
+        "实验结果能通过版本字段追溯。",
+        "核心模块有单元测试。",
+        "最小闭环有集成测试。",
+        "MVP 结果能被复现。"
+      ]
+    }
+  ],
+  "recommended_implementation_order": [
+    "创建顶层目录骨架：data、simulation、assortment、inventory、evaluation、doc。",
+    "完成 data 阶段：生成 synthetic v001、processed 表、features 样例、splits、validation report。",
+    "完成 simulation 阶段：跑通 NoTransferPolicy 和 HistoricalMeanPolicy 的多日仿真。",
+    "完成 assortment 阶段：跑通 Top-K、Reverse-Exclude、Hybrid 和 local order fulfillment 评估。",
+    "将 assortment_result 接入 simulation，验证选品结果能约束 FDC 调拨与履约。",
+    "完成 inventory 阶段：跑通 HistoricalMeanForecast、SS/TI、BaseStockPolicy、GreedyAllocation。",
+    "将 inventory transfer_recommendation 接入 simulation，形成库存策略回放闭环。",
+    "完成 evaluation 阶段：汇总选品、库存、仿真指标，生成第一版综合报告。",
+    "完成工程化基础：README、Makefile、manifest、统一配置、基础测试。",
+    "加入 ML-Top-K 简版模型。",
+    "加入端到端库存分配模型接口。",
+    "逐步升级 ForecastingModule、TISSGenerationModule 和端到端训练。"
+  ],
+  "mvp": {
+    "summary": "第一版不追求复杂模型，先追求完整闭环。",
+    "included": [
+      "生成 synthetic_small 数据，包含 SKU、仓网、订单、库存、促销、成本和切分。",
+      "用 NoTransferPolicy / HistoricalMeanPolicy 回放多日履约。",
+      "运行 Top-K、Reverse-Exclude、Hybrid，并输出 local_order_fulfillment_rate@K。",
+      "运行 HistoricalMeanForecast + SS/TI + BaseStockPolicy，输出 transfer_recommendation。",
+      "比较至少两种选品方法和两种库存策略，输出综合报告。"
+    ],
+    "excluded": [
+      "复杂深度学习 ML-Top-K。",
+      "完整端到端库存分配训练。",
+      "线上服务部署。",
+      "真实业务数据接入。",
+      "复杂可视化看板。"
+    ],
+    "completion_criteria": [
+      "数据能造。",
+      "流程能跑。",
+      "策略能评估。",
+      "结果能复现。",
+      "baseline 能比较。",
+      "报告能解释。"
+    ],
+    "completed": false,
+    "completed_work": []
+  },
+  "current_priority": [
+    {
+      "priority": 1,
+      "description": "构建可控、可复现的虚拟业务数据世界。"
+    },
+    {
+      "priority": 2,
+      "description": "构建能够回放库存、调拨、履约和缺货的仿真闭环。"
+    },
+    {
+      "priority": 3,
+      "description": "跑通 Top-K / Reverse-Exclude / Hybrid 选品闭环。"
+    },
+    {
+      "priority": 4,
+      "description": "跑通 BaseStock 库存分配闭环。"
+    },
+    {
+      "priority": 5,
+      "description": "建立 evaluation 统一比较口径。"
+    },
+    {
+      "priority": 6,
+      "description": "实现 ML-Top-K。"
+    },
+    {
+      "priority": 7,
+      "description": "实现端到端库存分配模型。"
+    }
+  ],
+  "last_updated": "2026-06-26"
+}

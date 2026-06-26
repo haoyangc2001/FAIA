@@ -1,0 +1,17 @@
+data_version: v001
+created_at: '2026-06-26T12:01:24'
+split_method: chronological
+counts:
+  train_dates: 126
+  val_dates: 27
+  test_dates: 27
+ranges:
+  train:
+  - '2026-01-01'
+  - '2026-05-06'
+  validation:
+  - '2026-05-07'
+  - '2026-06-02'
+  test:
+  - '2026-06-03'
+  - '2026-06-29'

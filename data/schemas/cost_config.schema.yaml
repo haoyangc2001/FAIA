@@ -1,0 +1,30 @@
+version: v001
+table: cost_config
+description: 成本配置表，供仿真和评估模块计算策略成本。
+primary_key:
+  - cost_item
+fields:
+  - name: cost_item
+    type: string
+    nullable: false
+    allowed_values: [transfer_cost, rdc_fallback_cost, lost_sales_cost, holding_cost]
+    description: 成本项。
+  - name: unit
+    type: string
+    nullable: false
+    description: 成本单位，例如 per_unit 或 per_unit_day。
+  - name: value
+    type: float
+    nullable: false
+    description: 成本数值。
+  - name: currency
+    type: string
+    nullable: false
+    description: 币种。
+  - name: description
+    type: string
+    nullable: true
+    description: 成本说明。
+constraints:
+  - value >= 0
+

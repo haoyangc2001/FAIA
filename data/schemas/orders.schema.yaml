@@ -1,0 +1,46 @@
+version: v001
+table: orders
+description: 订单主表，一行代表一个用户订单。
+primary_key:
+  - order_id
+foreign_keys:
+  - field: order_date
+    references: calendar.date
+  - field: fdc_id
+    references: warehouse_master.node_id
+  - field: rdc_id
+    references: warehouse_master.node_id
+fields:
+  - name: order_id
+    type: string
+    nullable: false
+    description: 订单唯一标识。
+  - name: order_date
+    type: date
+    nullable: false
+    description: 下单日期。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: 订单对应的兜底 RDC。
+  - name: fdc_id
+    type: string
+    nullable: false
+    description: 订单优先履约 FDC。
+  - name: user_region_id
+    type: string
+    nullable: false
+    description: 用户所在区域。
+  - name: order_item_count
+    type: integer
+    nullable: false
+    description: 订单明细 SKU 行数。
+  - name: is_multi_item
+    type: boolean
+    nullable: false
+    description: 是否为多商品订单。
+constraints:
+  - order_item_count >= 1
+  - fdc_id 必须对应 node_type = FDC
+  - rdc_id 必须对应 node_type = RDC
+

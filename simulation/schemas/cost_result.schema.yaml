@@ -1,0 +1,70 @@
+version: v001
+table: cost_result
+description: 每日成本明细输出表。
+primary_key:
+  - experiment_id
+  - simulation_date
+  - cost_scope
+  - scope_id
+  - sku_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 仿真实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: policy_version
+    type: string
+    nullable: false
+    description: 策略版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: false
+    description: 仿真规则版本。
+  - name: simulation_date
+    type: date
+    nullable: false
+    description: 仿真日期。
+  - name: cost_scope
+    type: string
+    nullable: false
+    allowed_values: [fdc, rdc, global]
+    description: 成本统计范围。
+  - name: scope_id
+    type: string
+    nullable: false
+    description: 范围 ID，例如 FDC001、RDC001 或 ALL。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID，聚合成本可使用 ALL。
+  - name: transfer_cost
+    type: float
+    nullable: false
+    description: 调拨成本。
+  - name: rdc_fallback_cost
+    type: float
+    nullable: false
+    description: RDC 代履约额外成本。
+  - name: lost_sales_cost
+    type: float
+    nullable: false
+    description: 缺货损失。
+  - name: holding_cost
+    type: float
+    nullable: false
+    description: 库存持有成本。
+  - name: total_cost
+    type: float
+    nullable: false
+    description: 成本合计。
+constraints:
+  - transfer_cost >= 0
+  - rdc_fallback_cost >= 0
+  - lost_sales_cost >= 0
+  - holding_cost >= 0
+  - total_cost = transfer_cost + rdc_fallback_cost + lost_sales_cost + holding_cost
+

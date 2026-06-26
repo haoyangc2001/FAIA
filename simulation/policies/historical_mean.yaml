@@ -1,0 +1,9 @@
+policy_version: historical_mean_v001
+policy_type: historical_mean
+description: 按历史平均需求生成补货建议。
+parameters:
+  lookback_days: 14
+  cover_days: 3
+  min_transfer_qty: 1
+  max_transfer_qty_per_sku: 200
+

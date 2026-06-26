@@ -1,0 +1,32 @@
+version: v001
+table: order_items
+description: 订单明细表，一行代表订单中的一个 SKU。
+primary_key:
+  - order_id
+  - sku_id
+foreign_keys:
+  - field: order_id
+    references: orders.order_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: order_id
+    type: string
+    nullable: false
+    description: 订单 ID。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: qty
+    type: integer
+    nullable: false
+    description: 购买数量。
+  - name: unit_price
+    type: float
+    nullable: false
+    description: 下单时单价。
+constraints:
+  - qty > 0
+  - unit_price >= 0
+

@@ -1,0 +1,54 @@
+version: v001
+table: sku_master
+description: 商品主数据，定义合成业务世界中的 SKU 静态属性。
+primary_key:
+  - sku_id
+fields:
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU 唯一标识。
+  - name: category_id
+    type: string
+    nullable: false
+    description: 类目 ID。
+  - name: brand_id
+    type: string
+    nullable: false
+    description: 品牌 ID。
+  - name: price
+    type: float
+    nullable: false
+    description: 售价。
+  - name: temperature_zone
+    type: string
+    nullable: false
+    allowed_values: [ambient, chilled, frozen]
+    description: 商品温层。
+  - name: volume
+    type: float
+    nullable: false
+    description: 单件体积。
+  - name: weight
+    type: float
+    nullable: false
+    description: 单件重量。
+  - name: shelf_life_days
+    type: integer
+    nullable: false
+    description: 保质期天数。
+  - name: is_regular_product
+    type: boolean
+    nullable: false
+    description: 是否为常规商品。
+  - name: base_popularity
+    type: float
+    nullable: false
+    description: 基础需求热度，用于生成长尾需求。
+constraints:
+  - price >= 0
+  - volume > 0
+  - weight > 0
+  - shelf_life_days > 0
+  - base_popularity >= 0
+

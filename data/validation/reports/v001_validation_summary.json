@@ -1,0 +1,40 @@
+{
+  "data_version": "v001",
+  "generated_at": "2026-06-26T12:41:56",
+  "overall_status": "PASS",
+  "total_checks": 58,
+  "failed_checks": 0,
+  "warnings": 0,
+  "counts": {
+    "synthetic": {
+      "sku_master": 3000,
+      "warehouse_master": 14,
+      "calendar": 180,
+      "sku_fdc_eligibility": 36000,
+      "promotion_plan": 1948,
+      "cost_config": 4,
+      "orders": 1234855,
+      "order_items": 1856325,
+      "inventory_snapshot": 4235400,
+      "transfer_plan": 51691,
+      "stockout_events": 2290830
+    },
+    "processed": {
+      "fdc_sku_daily_demand": 624438,
+      "order_type_table": 274420,
+      "order_type_items": 695935,
+      "inventory_daily_state": 4235400,
+      "candidate_pool_base": 32734
+    },
+    "features": {
+      "ml_topk_fdc_sku_features": 98202,
+      "inventory_features": 52590
+    },
+    "splits": {
+      "train_dates": 126,
+      "val_dates": 27,
+      "test_dates": 27
+    }
+  },
+  "report_path": "data/validation/reports/v001_validation_report.md"
+}

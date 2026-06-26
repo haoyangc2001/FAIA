@@ -1,0 +1,48 @@
+version: v001
+table: warehouse_master
+description: RDC/FDC 仓网主数据。
+primary_key:
+  - node_id
+fields:
+  - name: node_id
+    type: string
+    nullable: false
+    description: 仓节点唯一标识。
+  - name: node_type
+    type: string
+    nullable: false
+    allowed_values: [RDC, FDC]
+    description: 仓节点类型。
+  - name: rdc_id
+    type: string
+    nullable: true
+    description: FDC 所属 RDC；RDC 节点自身可为空。
+  - name: city_id
+    type: string
+    nullable: false
+    description: 城市 ID。
+  - name: region_id
+    type: string
+    nullable: false
+    description: 区域 ID。
+  - name: capacity_units
+    type: integer
+    nullable: false
+    description: 仓容量，按标准库存单位计。
+  - name: support_ambient
+    type: boolean
+    nullable: false
+    description: 是否支持常温。
+  - name: support_chilled
+    type: boolean
+    nullable: false
+    description: 是否支持冷藏。
+  - name: support_frozen
+    type: boolean
+    nullable: false
+    description: 是否支持冷冻。
+constraints:
+  - capacity_units > 0
+  - node_type = RDC 时 rdc_id 可为空
+  - node_type = FDC 时 rdc_id 必须存在于 RDC 节点
+

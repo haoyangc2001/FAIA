@@ -1,0 +1,83 @@
+version: v001
+table: transfer_result
+description: 每日调拨建议与实际可执行调拨结果。
+primary_key:
+  - experiment_id
+  - transfer_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 仿真实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: policy_version
+    type: string
+    nullable: false
+    description: 策略版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: false
+    description: 仿真规则版本。
+  - name: simulation_date
+    type: date
+    nullable: false
+    description: 生成调拨决策的仿真日期。
+  - name: transfer_id
+    type: string
+    nullable: false
+    description: 调拨结果唯一 ID。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: 发货 RDC。
+  - name: fdc_id
+    type: string
+    nullable: false
+    description: 收货 FDC。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: recommended_transfer_qty
+    type: integer
+    nullable: false
+    description: 策略建议调拨量。
+  - name: actual_transfer_qty
+    type: integer
+    nullable: false
+    description: 经过硬约束裁剪后的实际调拨量。
+  - name: clipped_qty
+    type: integer
+    nullable: false
+    description: 被裁剪掉的调拨量。
+  - name: clip_reason
+    type: string
+    nullable: true
+    description: 裁剪原因。
+  - name: ship_date
+    type: date
+    nullable: false
+    description: 发货日期。
+  - name: arrival_date
+    type: date
+    nullable: false
+    description: 预计到货日期。
+  - name: lead_time_days
+    type: integer
+    nullable: false
+    description: 调拨提前期。
+  - name: status
+    type: string
+    nullable: false
+    allowed_values: [planned, clipped, shipped, cancelled]
+    description: 调拨结果状态。
+constraints:
+  - recommended_transfer_qty >= 0
+  - actual_transfer_qty >= 0
+  - clipped_qty >= 0
+  - recommended_transfer_qty = actual_transfer_qty + clipped_qty
+  - arrival_date >= ship_date
+

@@ -1,0 +1,83 @@
+version: v001
+table: metrics_summary
+description: 仿真实验整体指标汇总 JSON 契约。
+primary_key:
+  - experiment_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 仿真实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: assortment_version
+    type: string
+    nullable: false
+    description: 选品或候选池版本，第一版使用 candidate_pool_base 对应的 assortment_v001。
+  - name: policy_version
+    type: string
+    nullable: false
+    description: 策略版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: false
+    description: 仿真规则版本。
+  - name: simulation_start_date
+    type: date
+    nullable: false
+    description: 仿真开始日期。
+  - name: simulation_end_date
+    type: date
+    nullable: false
+    description: 仿真结束日期。
+  - name: total_demand_qty
+    type: integer
+    nullable: false
+    description: 总需求量。
+  - name: fdc_fulfilled_qty
+    type: integer
+    nullable: false
+    description: FDC 本地履约量。
+  - name: rdc_fallback_qty
+    type: integer
+    nullable: false
+    description: RDC 代履约量。
+  - name: lost_sales_qty
+    type: integer
+    nullable: false
+    description: 缺货量。
+  - name: fdc_fulfillment_rate
+    type: float
+    nullable: false
+    description: FDC 本地履约率。
+  - name: loss_ratio
+    type: float
+    nullable: false
+    description: 缺货比例。
+  - name: transfer_cost
+    type: float
+    nullable: false
+    description: 总调拨成本。
+  - name: rdc_fallback_cost
+    type: float
+    nullable: false
+    description: 总 RDC 代履约成本。
+  - name: lost_sales_cost
+    type: float
+    nullable: false
+    description: 总缺货损失。
+  - name: holding_cost
+    type: float
+    nullable: false
+    description: 总库存持有成本。
+  - name: total_cost
+    type: float
+    nullable: false
+    description: 总成本。
+constraints:
+  - total_demand_qty = fdc_fulfilled_qty + rdc_fallback_qty + lost_sales_qty
+  - fdc_fulfillment_rate between 0 and 1
+  - loss_ratio between 0 and 1
+  - total_cost = transfer_cost + rdc_fallback_cost + lost_sales_cost + holding_cost

@@ -1,0 +1,52 @@
+version: v001
+table: promotion_plan
+description: 促销计划表。该表表示预测时点已知的未来计划，不能写入未来真实销量结果。
+primary_key:
+  - date
+  - sku_id
+foreign_keys:
+  - field: date
+    references: calendar.date
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: date
+    type: date
+    nullable: false
+    description: 促销日期。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: promotion_type
+    type: string
+    nullable: false
+    allowed_values: [direct_discount, coupon, flash_sale, platform_campaign]
+    description: 促销类型。
+  - name: discount_rate
+    type: float
+    nullable: false
+    description: 折扣率，例如 0.15 表示降价 15%。
+  - name: coupon_value
+    type: float
+    nullable: false
+    description: 优惠券金额。
+  - name: planned_exposure_level
+    type: integer
+    nullable: false
+    description: 计划曝光等级。
+  - name: campaign_phase
+    type: string
+    nullable: true
+    allowed_values: [warmup, peak, cooldown]
+    description: 活动阶段。
+  - name: planned_demand_lift
+    type: float
+    nullable: false
+    description: 用于订单生成的计划需求放大系数。
+constraints:
+  - discount_rate >= 0
+  - coupon_value >= 0
+  - planned_exposure_level >= 0
+  - planned_demand_lift >= 1
+

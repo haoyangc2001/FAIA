@@ -1,0 +1,39 @@
+version: v001
+table: calendar
+description: 日期维表，提供订单生成、特征构建和时间切分所需的日历信息。
+primary_key:
+  - date
+fields:
+  - name: date
+    type: date
+    nullable: false
+    description: 日期。
+  - name: day_of_week
+    type: integer
+    nullable: false
+    description: 星期，1 表示周一，7 表示周日。
+  - name: is_weekend
+    type: boolean
+    nullable: false
+    description: 是否周末。
+  - name: is_holiday
+    type: boolean
+    nullable: false
+    description: 是否节假日。
+  - name: campaign_window
+    type: string
+    nullable: true
+    description: 大促窗口名称。
+  - name: campaign_phase
+    type: string
+    nullable: true
+    allowed_values: [warmup, peak, cooldown]
+    description: 活动阶段。
+  - name: demand_multiplier
+    type: float
+    nullable: false
+    description: 日期级需求放大系数。
+constraints:
+  - day_of_week between 1 and 7
+  - demand_multiplier > 0
+

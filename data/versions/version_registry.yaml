@@ -1,0 +1,7 @@
+versions:
+- data_version: v001
+  status: validated
+  registered_at: '2026-06-26T12:42:03'
+  manifest: data/versions/v001/manifest.yaml
+  validation_report: data/validation/reports/v001_validation_report.md
+  config: data/configs/synthetic_small.yaml

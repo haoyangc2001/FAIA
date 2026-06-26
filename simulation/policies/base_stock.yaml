@@ -1,0 +1,10 @@
+policy_version: base_stock_v001
+policy_type: base_stock
+description: 根据目标库存和安全库存生成补货建议。
+parameters:
+  lookback_days: 14
+  target_cover_days: 5
+  safety_cover_days: 2
+  min_transfer_qty: 1
+  max_transfer_qty_per_sku: 300
+

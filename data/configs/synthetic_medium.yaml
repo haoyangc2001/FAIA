@@ -1,0 +1,70 @@
+data_version: v001_medium
+schema_version: v001
+generator_version: v001
+seed: 20260626
+output:
+  synthetic_dir: data/synthetic/v001_medium
+  processed_dir: data/processed/v001_medium
+  features_dir: data/features/v001_medium
+  splits_dir: data/splits/v001_medium
+  validation_report: data/validation/reports/v001_medium_validation_report.md
+format:
+  table_format: csv
+  encoding: utf-8
+calendar:
+  start_date: 2026-01-01
+  num_days: 180
+  timezone: Asia/Shanghai
+network:
+  num_rdcs: 2
+  num_fdcs: 12
+  fdc_capacity_min: 1800
+  fdc_capacity_max: 2600
+  temperature_zones:
+    ambient: 0.72
+    chilled: 0.22
+    frozen: 0.06
+catalog:
+  num_skus: 5000
+  num_categories: 50
+  num_brands: 500
+  regular_product_ratio: 0.85
+  long_tail_distribution: zipf
+  zipf_alpha: 1.12
+orders:
+  daily_order_min: 8000
+  daily_order_max: 12000
+  multi_item_order_ratio: 0.38
+  max_items_per_order: 8
+  regional_preference_strength: 0.30
+  category_preference_strength: 0.22
+  basket_affinity_strength: 0.35
+promotion:
+  promoted_sku_ratio: 0.08
+  campaign_day_ratio: 0.15
+  demand_lift_min: 1.15
+  demand_lift_max: 3.00
+  promotion_types:
+    - direct_discount
+    - coupon
+    - flash_sale
+    - platform_campaign
+inventory:
+  rdc_initial_days_of_supply: 35
+  fdc_initial_days_of_supply: 8
+  lead_time_min_days: 1
+  lead_time_max_days: 3
+  allow_negative_inventory: false
+cost:
+  transfer_cost_per_unit: 0.25
+  rdc_fallback_cost_per_unit: 1.20
+  lost_sales_cost_per_unit: 5.00
+  holding_cost_per_unit_day: 0.03
+split:
+  train_ratio: 0.70
+  validation_ratio: 0.15
+  test_ratio: 0.15
+validation:
+  fail_on_error: true
+  check_future_leakage: true
+

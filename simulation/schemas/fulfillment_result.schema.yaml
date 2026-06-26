@@ -1,0 +1,64 @@
+version: v001
+table: fulfillment_result
+description: 每日 FDC-SKU 需求履约路径结果。
+primary_key:
+  - experiment_id
+  - simulation_date
+  - fdc_id
+  - sku_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 仿真实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: policy_version
+    type: string
+    nullable: false
+    description: 策略版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: false
+    description: 仿真规则版本。
+  - name: simulation_date
+    type: date
+    nullable: false
+    description: 仿真日期。
+  - name: fdc_id
+    type: string
+    nullable: false
+    description: 需求所属 FDC。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: FDC 所属兜底 RDC。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: demand_qty
+    type: integer
+    nullable: false
+    description: 当日需求量。
+  - name: fdc_fulfilled_qty
+    type: integer
+    nullable: false
+    description: FDC 本地履约量。
+  - name: rdc_fallback_qty
+    type: integer
+    nullable: false
+    description: RDC 代履约量。
+  - name: lost_sales_qty
+    type: integer
+    nullable: false
+    description: 未满足需求量。
+constraints:
+  - demand_qty >= 0
+  - fdc_fulfilled_qty >= 0
+  - rdc_fallback_qty >= 0
+  - lost_sales_qty >= 0
+  - demand_qty = fdc_fulfilled_qty + rdc_fallback_qty + lost_sales_qty
+

@@ -1,0 +1,5 @@
+policy_version: no_transfer_v001
+policy_type: no_transfer
+description: 不生成任何调拨建议，用于验证仿真器基础履约与库存回放逻辑。
+parameters: {}
+

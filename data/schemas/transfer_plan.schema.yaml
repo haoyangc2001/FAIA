@@ -1,0 +1,52 @@
+version: v001
+table: transfer_plan
+description: RDC 到 FDC 的调拨计划与到货记录。
+primary_key:
+  - transfer_id
+foreign_keys:
+  - field: rdc_id
+    references: warehouse_master.node_id
+  - field: fdc_id
+    references: warehouse_master.node_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: transfer_id
+    type: string
+    nullable: false
+    description: 调拨单 ID。
+  - name: ship_date
+    type: date
+    nullable: false
+    description: RDC 发货日期。
+  - name: arrival_date
+    type: date
+    nullable: false
+    description: FDC 到货日期。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: 发货 RDC。
+  - name: fdc_id
+    type: string
+    nullable: false
+    description: 收货 FDC。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: transfer_qty
+    type: integer
+    nullable: false
+    description: 调拨数量。
+  - name: lead_time_days
+    type: integer
+    nullable: false
+    description: 调拨提前期。
+constraints:
+  - transfer_qty > 0
+  - lead_time_days >= 0
+  - arrival_date >= ship_date
+  - rdc_id 必须对应 node_type = RDC
+  - fdc_id 必须对应 node_type = FDC
+

@@ -1,0 +1,36 @@
+version: v001
+table: sku_fdc_eligibility
+description: SKU-FDC 可履约关系，用于限定每个 FDC 的候选 SKU 池。
+primary_key:
+  - sku_id
+  - fdc_id
+foreign_keys:
+  - field: sku_id
+    references: sku_master.sku_id
+  - field: fdc_id
+    references: warehouse_master.node_id
+fields:
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: fdc_id
+    type: string
+    nullable: false
+    description: FDC ID。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: FDC 所属 RDC。
+  - name: eligible_flag
+    type: boolean
+    nullable: false
+    description: 是否可进入该 FDC。
+  - name: ineligible_reason
+    type: string
+    nullable: true
+    description: 不可履约原因，例如温区不支持或区域限制。
+constraints:
+  - fdc_id 必须对应 node_type = FDC
+  - eligible_flag = true 时 ineligible_reason 为空
+

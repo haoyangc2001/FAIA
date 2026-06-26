@@ -1,0 +1,50 @@
+version: v001
+table: stockout_events
+description: 缺货事件表，记录 FDC/RDC 因库存不足造成的履约失败或兜底履约。
+primary_key:
+  - date
+  - node_id
+  - sku_id
+  - stockout_reason
+foreign_keys:
+  - field: date
+    references: calendar.date
+  - field: node_id
+    references: warehouse_master.node_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: date
+    type: date
+    nullable: false
+    description: 缺货日期。
+  - name: node_id
+    type: string
+    nullable: false
+    description: 发生缺货的节点。
+  - name: node_type
+    type: string
+    nullable: false
+    allowed_values: [RDC, FDC]
+    description: 节点类型。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: stockout_flag
+    type: boolean
+    nullable: false
+    description: 是否缺货。
+  - name: stockout_qty
+    type: integer
+    nullable: false
+    description: 缺货数量。
+  - name: stockout_reason
+    type: string
+    nullable: false
+    allowed_values: [not_assorted, insufficient_fdc_inventory, insufficient_rdc_inventory]
+    description: 缺货原因。
+constraints:
+  - stockout_qty >= 0
+  - stockout_flag = false 时 stockout_qty = 0
+

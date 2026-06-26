@@ -1,0 +1,28 @@
+simulation_rule_version: sim_rule_v001
+description: 第一版业务仿真规则，服务于 data_version v001 的 baseline 回放。
+time:
+  default_lead_time_days: 2
+  min_lead_time_days: 1
+  max_lead_time_days: 3
+  initial_inventory_timing: end_of_day
+fulfillment:
+  priority:
+    - fdc_local
+    - rdc_fallback
+    - lost_sales
+allocation:
+  require_candidate_pair: true
+  require_non_negative_transfer: true
+  integer_transfer_qty: true
+  clip_by_rdc_inventory: true
+  clip_by_fdc_capacity: true
+  rdc_reserve_qty_per_sku: 0
+  fdc_receiving_limit_units_per_day: null
+  rdc_shipping_limit_units_per_day: null
+cost:
+  holding_cost_enabled: true
+validation:
+  enforce_non_negative_inventory: true
+  enforce_demand_conservation: true
+  enforce_pipeline_arrival_date: true
+
