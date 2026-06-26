@@ -1,0 +1,14 @@
+method_version: hybrid_v001
+method_name: hybrid_selection
+description: 交替融合 Top-K 历史频次排序和 Reverse-Exclude 共购结构排序，再用加权分重新排序输出最终 Hybrid SKU 集合。
+selection_strategy: alternating_union
+score_formula: topk_weight * normalized_topk_score + reverse_weight * normalized_structure_score
+topk_weight: 0.55
+reverse_weight: 0.45
+tie_break_fields:
+  - topk_score
+  - structure_score
+  - future_promo_score
+  - static_priority_score
+outputs:
+  - hybrid_result.csv

@@ -1,0 +1,117 @@
+version: v001
+table: assortment_result
+description: 每个 FDC、anchor_date 的最终 SKU 选品结果，对 simulation 和 inventory 提供稳定接口。
+primary_key:
+  - experiment_id
+  - assortment_version
+  - anchor_date
+  - fdc_id
+  - sku_id
+foreign_keys:
+  - field: fdc_id
+    references: warehouse_master.node_id
+  - field: rdc_id
+    references: warehouse_master.node_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 选品实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: candidate_pool_version
+    type: string
+    nullable: false
+    description: 候选池生成规则版本。
+  - name: k_rule_version
+    type: string
+    nullable: false
+    description: K 值计算规则版本。
+  - name: method_version
+    type: string
+    nullable: false
+    description: 选品方法版本，例如 topk_v001、reverse_exclude_v001、hybrid_v001。
+  - name: assortment_version
+    type: string
+    nullable: false
+    description: 对外发布的选品结果版本。
+  - name: anchor_date
+    type: date
+    nullable: false
+    description: 选品决策日期。
+  - name: effective_start_date
+    type: date
+    nullable: false
+    description: 选品结果开始生效日期。
+  - name: effective_end_date
+    type: date
+    nullable: false
+    description: 选品结果结束生效日期。
+  - name: fdc_id
+    type: string
+    nullable: false
+    description: 前置仓 ID。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: FDC 所属 RDC。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: selected_flag
+    type: boolean
+    nullable: false
+    description: 是否进入最终对外 assortment。
+  - name: rank
+    type: integer
+    nullable: true
+    description: SKU 在当前 FDC 最终选品中的排名，未选中 SKU 可为空。
+  - name: score
+    type: float
+    nullable: false
+    description: 最终选品排序分。
+  - name: topk_score
+    type: float
+    nullable: true
+    description: Top-K 频次或需求得分。
+  - name: structure_score
+    type: float
+    nullable: true
+    description: 共购结构或 Reverse-Exclude 得分。
+  - name: ml_score
+    type: float
+    nullable: true
+    description: ML-Top-K 预测得分。
+  - name: source_tag
+    type: string
+    nullable: false
+    allowed_values: [topk, reverse_exclude, hybrid, ml_topk, forced_include, baseline]
+    description: SKU 被选中或排序的主要来源。
+  - name: selected_k
+    type: integer
+    nullable: false
+    description: 当前 FDC 的 K 值。
+  - name: candidate_sku_count
+    type: integer
+    nullable: false
+    description: 当前 FDC 的候选 SKU 数。
+  - name: cumulative_volume
+    type: float
+    nullable: true
+    description: 按 rank 累计的 SKU 体积，用于容量复盘。
+constraints:
+  - effective_start_date > anchor_date
+  - effective_end_date >= effective_start_date
+  - selected_k >= 0
+  - candidate_sku_count >= selected_k
+  - score >= 0
+  - selected_flag = true 时 rank 不为空
+  - selected_flag = true 时 rank >= 1
+  - selected_flag = true 时 rank <= selected_k
+  - 每个 experiment_id、assortment_version、anchor_date、fdc_id 下 selected_flag=true 的行数 <= selected_k
+  - 每个 experiment_id、assortment_version、anchor_date、fdc_id 下 selected_flag=true 的 rank 应从 1 连续递增

@@ -1437,7 +1437,122 @@
       "directory": "assortment/",
       "small_goal": "根据历史订单结构、候选 SKU 池、FDC 容量约束和未来需求信号，为每个 FDC 生成可执行的 SKU assortment。",
       "completed": false,
-      "completed_work": [],
+      "completed_work": [
+        {
+          "date": "2026-06-26",
+          "summary": "完成前置仓选品系统定位与边界说明，明确选品模块只输出 SKU-FDC 关系，不直接决定库存数量和调拨量。",
+          "outputs": [
+            "assortment/README.md"
+          ]
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "创建 assortment/ 目录骨架，建立第三阶段选品系统的独立模块目录。",
+          "outputs": [
+            "assortment/configs/",
+            "assortment/schemas/",
+            "assortment/methods/",
+            "assortment/models/ml_topk/",
+            "assortment/src/",
+            "assortment/scripts/",
+            "assortment/tests/",
+            "assortment/runs/",
+            "assortment/reports/"
+          ]
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "定义第一版选品输入输出契约，覆盖候选池、K 表、最终选品结果和选品评估指标。",
+          "outputs": [
+            "assortment/schemas/candidate_pool.schema.yaml",
+            "assortment/schemas/k_table.schema.yaml",
+            "assortment/schemas/assortment_result.schema.yaml",
+            "assortment/schemas/assortment_metrics.schema.yaml"
+          ]
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成第一版候选 SKU 池构建，按 anchor_date 汇总历史需求、未来促销、战略 SKU 和共购重要性信号，并过滤非候选 SKU。",
+          "outputs": [
+            "assortment/src/candidate_pool.py",
+            "assortment/runs/exp_assortment_v001_topk/candidate_pool.csv"
+          ],
+          "metrics": {
+            "candidate_pool_rows": 32734,
+            "candidate_count": 24963,
+            "filtered_count": 7771
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成每个 FDC 的 K 值计算，结合历史订单频次覆盖目标和 FDC 物理容量约束得到 selected_k。",
+          "outputs": [
+            "assortment/src/k_selector.py",
+            "assortment/runs/exp_assortment_v001_topk/k_table.csv"
+          ],
+          "metrics": {
+            "fdc_count": 12,
+            "total_selected_k": 3851,
+            "min_selected_k": 206,
+            "max_selected_k": 470,
+            "avg_selected_k": 320.9167
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 Top-K baseline，按历史窗口内 SKU 被订单包含次数排序，为每个 FDC 选择前 K 个 SKU。",
+          "outputs": [
+            "assortment/src/topk.py",
+            "assortment/scripts/run_assortment.py",
+            "assortment/runs/exp_assortment_v001_topk/topk_result.csv",
+            "assortment/runs/exp_assortment_v001_topk/run_manifest.yaml"
+          ],
+          "metrics": {
+            "topk_result_rows": 3851,
+            "fdc_count": 12,
+            "min_selected_rows": 206,
+            "max_selected_rows": 470
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 Reverse-Exclude 结构选品方法，基于历史订单 basket 从候选全集反向删除对订单完整覆盖影响最小的 SKU。",
+          "outputs": [
+            "assortment/methods/reverse_exclude.yaml",
+            "assortment/src/reverse_exclude.py",
+            "assortment/runs/exp_assortment_v001_topk/reverse_exclude_result.csv",
+            "assortment/runs/exp_assortment_v001_topk/run_manifest.yaml"
+          ],
+          "metrics": {
+            "reverse_exclude_result_rows": 3851,
+            "fdc_count": 12,
+            "historical_orders_seen": 403289,
+            "usable_historical_orders": 326678,
+            "total_usable_basket_types": 79919,
+            "total_active_order_count": 263780
+          }
+        },
+        {
+          "date": "2026-06-26",
+          "summary": "完成 Hybrid Selection，交替融合 Top-K 历史频次排序和 Reverse-Exclude 共购结构排序，再用加权归一化分重新排序。",
+          "outputs": [
+            "assortment/methods/hybrid.yaml",
+            "assortment/src/hybrid.py",
+            "assortment/runs/exp_assortment_v001_topk/hybrid_result.csv",
+            "assortment/runs/exp_assortment_v001_topk/run_manifest.yaml"
+          ],
+          "metrics": {
+            "hybrid_result_rows": 3851,
+            "fdc_count": 12,
+            "topk_weight": 0.55,
+            "reverse_weight": 0.45,
+            "topk_overlap_rows": 3768,
+            "reverse_overlap_rows": 3702,
+            "avg_topk_overlap_ratio": 0.978447,
+            "avg_reverse_overlap_ratio": 0.961309
+          }
+        }
+      ],
       "work_items": [
         {
           "item_id": "3.1",
@@ -1446,8 +1561,16 @@
           "deliverables": [
             "assortment/README.md 中的定位说明"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "在 assortment/README.md 中补充模块目标、职责边界、非职责范围、核心指标、输入输出和版本字段。",
+              "outputs": [
+                "assortment/README.md"
+              ]
+            }
+          ]
         },
         {
           "item_id": "3.2",
@@ -1456,8 +1579,24 @@
           "deliverables": [
             "assortment/"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "建立第三阶段目录骨架，并使用 .gitkeep 保留暂未实现代码的目录。",
+              "outputs": [
+                "assortment/configs/",
+                "assortment/schemas/",
+                "assortment/methods/",
+                "assortment/models/ml_topk/",
+                "assortment/src/",
+                "assortment/scripts/",
+                "assortment/tests/",
+                "assortment/runs/",
+                "assortment/reports/"
+              ]
+            }
+          ]
         },
         {
           "item_id": "3.3",
@@ -1469,8 +1608,19 @@
             "assortment_result.schema.yaml",
             "assortment_metrics.schema.yaml"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "完成第一版 schema 契约，固定 candidate_pool、k_table、assortment_result、assortment_metrics 的字段、主键、外键和约束。",
+              "outputs": [
+                "assortment/schemas/candidate_pool.schema.yaml",
+                "assortment/schemas/k_table.schema.yaml",
+                "assortment/schemas/assortment_result.schema.yaml",
+                "assortment/schemas/assortment_metrics.schema.yaml"
+              ]
+            }
+          ]
         },
         {
           "item_id": "3.4",
@@ -1479,8 +1629,32 @@
           "deliverables": [
             "assortment/runs/<experiment_id>/candidate_pool.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "实现候选池构建逻辑，读取 candidate_pool_base、ml_topk features、order_type_table 和 order_type_items，输出带 candidate_flag、filter_reason、recall_source 和历史/促销/静态优先级字段的候选池。",
+              "outputs": [
+                "assortment/src/candidate_pool.py",
+                "assortment/runs/exp_assortment_v001_topk/candidate_pool.csv"
+              ],
+              "metrics": {
+                "candidate_pool_rows": 32734,
+                "candidate_count": 24963,
+                "filtered_count": 7771,
+                "recall_source_counts": {
+                  "co_purchase": 1883,
+                  "historical_demand": 21683,
+                  "promotion": 1395,
+                  "strategic": 2
+                },
+                "filter_reason_counts": {
+                  "no_historical_or_priority_signal": 2992,
+                  "non_regular": 4779
+                }
+              }
+            }
+          ]
         },
         {
           "item_id": "3.5",
@@ -1489,8 +1663,24 @@
           "deliverables": [
             "assortment/runs/<experiment_id>/k_table.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "实现 K 值计算逻辑，先按历史订单频次累计得到 coverage_target_k，再结合 FDC capacity_units、SKU 平均体积、min_k 和 max_k 裁剪得到 selected_k。",
+              "outputs": [
+                "assortment/src/k_selector.py",
+                "assortment/runs/exp_assortment_v001_topk/k_table.csv"
+              ],
+              "metrics": {
+                "k_table_rows": 12,
+                "total_selected_k": 3851,
+                "min_selected_k": 206,
+                "max_selected_k": 470,
+                "avg_selected_k": 320.9167
+              }
+            }
+          ]
         },
         {
           "item_id": "3.6",
@@ -1499,8 +1689,27 @@
           "deliverables": [
             "topk_result.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "实现 Top-K baseline 和运行入口，按 historical_order_count 排序并用 future_promo_score、static_priority_score、sku_id 作为稳定 tie-break，为每个 FDC 输出 rank 连续的前 K SKU。",
+              "outputs": [
+                "assortment/configs/assortment_small.yaml",
+                "assortment/methods/topk.yaml",
+                "assortment/src/topk.py",
+                "assortment/scripts/run_assortment.py",
+                "assortment/runs/exp_assortment_v001_topk/topk_result.csv",
+                "assortment/runs/exp_assortment_v001_topk/run_manifest.yaml"
+              ],
+              "metrics": {
+                "topk_result_rows": 3851,
+                "fdc_count": 12,
+                "min_selected_rows": 206,
+                "max_selected_rows": 470
+              }
+            }
+          ]
         },
         {
           "item_id": "3.7",
@@ -1509,8 +1718,33 @@
           "deliverables": [
             "reverse_exclude_result.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "实现 Reverse-Exclude 算法，按 K 表历史窗口读取订单 basket，构建 sku_to_orders、active_order、active_sku 和 lazy min-heap，逐步删除 influence 最低的 SKU，最终输出每个 FDC 的保留 SKU 集合和结构分。",
+              "outputs": [
+                "assortment/methods/reverse_exclude.yaml",
+                "assortment/src/reverse_exclude.py",
+                "assortment/scripts/run_assortment.py",
+                "assortment/runs/exp_assortment_v001_topk/reverse_exclude_result.csv",
+                "assortment/runs/exp_assortment_v001_topk/run_manifest.yaml"
+              ],
+              "metrics": {
+                "reverse_exclude_result_rows": 3851,
+                "fdc_count": 12,
+                "min_selected_rows": 206,
+                "max_selected_rows": 470,
+                "historical_orders_seen": 403289,
+                "usable_historical_orders": 326678,
+                "skipped_non_candidate_baskets": 76611,
+                "total_usable_basket_types": 79919,
+                "total_active_basket_types": 34095,
+                "total_usable_order_count": 326678,
+                "total_active_order_count": 263780
+              }
+            }
+          ]
         },
         {
           "item_id": "3.8",
@@ -1519,8 +1753,32 @@
           "deliverables": [
             "hybrid_result.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-26",
+              "summary": "实现 Hybrid Selection，先从 Top-K 和 Reverse-Exclude 两个排序结果中交替取 SKU 形成融合集合，再按 topk_weight 与 reverse_weight 计算归一化 hybrid score，输出 rank 连续的最终结果。",
+              "outputs": [
+                "assortment/methods/hybrid.yaml",
+                "assortment/src/hybrid.py",
+                "assortment/scripts/run_assortment.py",
+                "assortment/runs/exp_assortment_v001_topk/hybrid_result.csv",
+                "assortment/runs/exp_assortment_v001_topk/run_manifest.yaml"
+              ],
+              "metrics": {
+                "hybrid_result_rows": 3851,
+                "fdc_count": 12,
+                "min_selected_rows": 206,
+                "max_selected_rows": 470,
+                "topk_weight": 0.55,
+                "reverse_weight": 0.45,
+                "topk_overlap_rows": 3768,
+                "reverse_overlap_rows": 3702,
+                "avg_topk_overlap_ratio": 0.978447,
+                "avg_reverse_overlap_ratio": 0.961309
+              }
+            }
+          ]
         },
         {
           "item_id": "3.9",

@@ -1,0 +1,70 @@
+experiment_id: exp_assortment_v001_topk
+data_version: v001
+candidate_pool_version: candidate_pool_v001
+k_rule_version: k_rule_v001
+method_version: topk_v001
+assortment_version: assortment_topk_v001
+assortment_root: assortment
+data_root: data
+anchor_date: 2026-06-02
+effective_start_date: 2026-06-03
+effective_end_date: 2026-06-29
+inputs:
+  warehouse_master: data/synthetic/v001/warehouse_master.csv
+  orders: data/synthetic/v001/orders.csv
+  order_items: data/synthetic/v001/order_items.csv
+  candidate_pool_base: data/processed/v001/candidate_pool_base.csv
+  order_type_table: data/processed/v001/order_type_table.csv
+  order_type_items: data/processed/v001/order_type_items.csv
+  ml_topk_features: data/features/ml_topk/v001/fdc_sku_features.csv
+candidate_pool:
+  history_order_field: hist_60d_orders
+  history_demand_field: hist_60d_qty
+  active_days_field: hist_30d_active_days
+  future_promo_days_field: future_promo_days_14d
+  future_campaign_days_field: future_campaign_days_14d
+  min_historical_orders: 1
+  filter_non_regular: true
+  include_priority_non_regular: false
+  strategic_top_n_per_fdc: 150
+  co_purchase_top_n_per_fdc: 200
+  new_product_active_days_threshold: 3
+  new_product_min_base_popularity: 0.02
+  future_promo_day_weight: 1.0
+  future_campaign_day_weight: 0.1
+k_rule:
+  target_order_coverage: 0.85
+  min_k: 100
+  max_k: 800
+  default_k: 300
+  capacity_utilization_ratio: 0.65
+  avg_volume_top_n: 300
+topk:
+  score_field: historical_order_count
+  tie_break_fields:
+    - future_promo_score
+    - static_priority_score
+reverse_exclude:
+  method_version: reverse_exclude_v001
+  assortment_version: assortment_reverse_exclude_v001
+  include_single_item_orders: true
+  max_order_sku_count: 20
+  min_order_count: 1
+  tie_break_fields:
+    - historical_order_count
+    - future_promo_score
+    - static_priority_score
+hybrid:
+  method_version: hybrid_v001
+  assortment_version: assortment_hybrid_v001
+  selection_strategy: alternating_union
+  topk_weight: 0.55
+  reverse_weight: 0.45
+  score_precision: 8
+  tie_break_fields:
+    - topk_score
+    - structure_score
+    - future_promo_score
+    - static_priority_score
+output:
+  run_dir: assortment/runs/exp_assortment_v001_topk

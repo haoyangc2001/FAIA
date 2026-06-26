@@ -1,0 +1,9 @@
+method_version: topk_v001
+method_name: topk_baseline
+description: 按历史窗口内 SKU 被订单包含次数排序，为每个 FDC 选择前 K 个 SKU。
+score_field: historical_order_count
+tie_break_fields:
+  - future_promo_score
+  - static_priority_score
+outputs:
+  - topk_result.csv

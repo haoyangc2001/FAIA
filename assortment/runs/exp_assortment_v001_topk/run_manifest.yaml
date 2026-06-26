@@ -1,0 +1,205 @@
+experiment_id: exp_assortment_v001_topk
+data_version: v001
+candidate_pool_version: candidate_pool_v001
+k_rule_version: k_rule_v001
+method_version: topk_v001
+assortment_version: assortment_topk_v001
+method_versions:
+  topk: topk_v001
+  reverse_exclude: reverse_exclude_v001
+  hybrid: hybrid_v001
+assortment_versions:
+  topk: assortment_topk_v001
+  reverse_exclude: assortment_reverse_exclude_v001
+  hybrid: assortment_hybrid_v001
+anchor_date: '2026-06-02'
+effective_start_date: '2026-06-03'
+effective_end_date: '2026-06-29'
+created_at: '2026-06-26T14:37:45'
+run_dir: assortment/runs/exp_assortment_v001_topk
+config_snapshot: assortment/runs/exp_assortment_v001_topk/assortment_config.yaml
+row_counts:
+  candidate_pool: 32734
+  k_table: 12
+  topk_result: 3851
+  reverse_exclude_result: 3851
+  hybrid_result: 3851
+candidate_summary:
+  row_count: 32734
+  candidate_count: 24963
+  filtered_count: 7771
+  recall_source_counts:
+    co_purchase: 1883
+    historical_demand: 21683
+    promotion: 1395
+    strategic: 2
+  filter_reason_counts:
+    no_historical_or_priority_signal: 2992
+    non_regular: 4779
+k_summary:
+  row_count: 12
+  fdc_count: 12
+  total_selected_k: 3851
+  min_selected_k: 206
+  max_selected_k: 470
+  avg_selected_k: 320.9167
+topk_summary:
+  row_count: 3851
+  fdc_count: 12
+  min_selected_rows: 206
+  max_selected_rows: 470
+  total_selected_rows: 3851
+reverse_exclude_summary:
+  row_count: 3851
+  fdc_count: 12
+  min_selected_rows: 206
+  max_selected_rows: 470
+  total_selected_rows: 3851
+  basket_load_stats:
+    historical_orders_seen: 403289
+    usable_historical_orders: 326678
+    skipped_non_candidate_baskets: 76611
+  total_usable_basket_types: 79919
+  total_active_basket_types: 34095
+  total_usable_order_count: 326678
+  total_active_order_count: 263780
+  fdc_summaries:
+    FDC001:
+      candidate_count: 2226
+      selected_count: 328
+      removed_count: 1898
+      usable_basket_types: 7409
+      active_basket_types: 3089
+      invalidated_basket_types: 4320
+      usable_order_count: 30908
+      active_order_count: 24888
+      invalidated_order_count: 6020
+    FDC002:
+      candidate_count: 2218
+      selected_count: 323
+      removed_count: 1895
+      usable_basket_types: 7071
+      active_basket_types: 2905
+      invalidated_basket_types: 4166
+      usable_order_count: 29465
+      active_order_count: 23803
+      invalidated_order_count: 5662
+    FDC003:
+      candidate_count: 1806
+      selected_count: 260
+      removed_count: 1546
+      usable_basket_types: 6454
+      active_basket_types: 2632
+      invalidated_basket_types: 3822
+      usable_order_count: 27600
+      active_order_count: 22262
+      invalidated_order_count: 5338
+    FDC004:
+      candidate_count: 2052
+      selected_count: 313
+      removed_count: 1739
+      usable_basket_types: 6136
+      active_basket_types: 2601
+      invalidated_basket_types: 3535
+      usable_order_count: 24385
+      active_order_count: 19668
+      invalidated_order_count: 4717
+    FDC005:
+      candidate_count: 2291
+      selected_count: 470
+      removed_count: 1821
+      usable_basket_types: 7484
+      active_basket_types: 3696
+      invalidated_basket_types: 3788
+      usable_order_count: 26802
+      active_order_count: 21709
+      invalidated_order_count: 5093
+    FDC006:
+      candidate_count: 1630
+      selected_count: 206
+      removed_count: 1424
+      usable_basket_types: 5620
+      active_basket_types: 2115
+      invalidated_basket_types: 3505
+      usable_order_count: 25645
+      active_order_count: 20716
+      invalidated_order_count: 4929
+    FDC007:
+      candidate_count: 2246
+      selected_count: 331
+      removed_count: 1915
+      usable_basket_types: 7527
+      active_basket_types: 3141
+      invalidated_basket_types: 4386
+      usable_order_count: 31646
+      active_order_count: 25500
+      invalidated_order_count: 6146
+    FDC008:
+      candidate_count: 2096
+      selected_count: 298
+      removed_count: 1798
+      usable_basket_types: 6671
+      active_basket_types: 2824
+      invalidated_basket_types: 3847
+      usable_order_count: 27923
+      active_order_count: 22618
+      invalidated_order_count: 5305
+    FDC009:
+      candidate_count: 2201
+      selected_count: 443
+      removed_count: 1758
+      usable_basket_types: 6460
+      active_basket_types: 3199
+      invalidated_basket_types: 3261
+      usable_order_count: 22319
+      active_order_count: 18018
+      invalidated_order_count: 4301
+    FDC010:
+      candidate_count: 2020
+      selected_count: 269
+      removed_count: 1751
+      usable_basket_types: 6040
+      active_basket_types: 2391
+      invalidated_basket_types: 3649
+      usable_order_count: 25390
+      active_order_count: 20470
+      invalidated_order_count: 4920
+    FDC011:
+      candidate_count: 2080
+      selected_count: 297
+      removed_count: 1783
+      usable_basket_types: 6430
+      active_basket_types: 2695
+      invalidated_basket_types: 3735
+      usable_order_count: 26606
+      active_order_count: 21492
+      invalidated_order_count: 5114
+    FDC012:
+      candidate_count: 2097
+      selected_count: 313
+      removed_count: 1784
+      usable_basket_types: 6617
+      active_basket_types: 2807
+      invalidated_basket_types: 3810
+      usable_order_count: 27989
+      active_order_count: 22636
+      invalidated_order_count: 5353
+hybrid_summary:
+  row_count: 3851
+  fdc_count: 12
+  min_selected_rows: 206
+  max_selected_rows: 470
+  total_selected_rows: 3851
+  topk_weight: 0.55
+  reverse_weight: 0.45
+  topk_overlap_rows: 3768
+  reverse_overlap_rows: 3702
+  avg_topk_overlap_ratio: 0.978447
+  avg_reverse_overlap_ratio: 0.961309
+outputs:
+  candidate_pool: assortment/runs/exp_assortment_v001_topk/candidate_pool.csv
+  k_table: assortment/runs/exp_assortment_v001_topk/k_table.csv
+  topk_result: assortment/runs/exp_assortment_v001_topk/topk_result.csv
+  reverse_exclude_result: assortment/runs/exp_assortment_v001_topk/reverse_exclude_result.csv
+  hybrid_result: assortment/runs/exp_assortment_v001_topk/hybrid_result.csv
+  run_manifest: assortment/runs/exp_assortment_v001_topk/run_manifest.yaml

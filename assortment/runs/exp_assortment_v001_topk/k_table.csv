@@ -1,0 +1,13 @@
+experiment_id,data_version,candidate_pool_version,k_rule_version,anchor_date,effective_start_date,effective_end_date,fdc_id,rdc_id,candidate_sku_count,target_order_coverage,capacity_volume_limit,avg_selected_sku_volume,physical_capacity_k,coverage_target_k,min_k,max_k,selected_k,k_source,historical_window_start,historical_window_end
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC001,RDC001,2226,0.85,1090.7,1.499887,727,328,100,800,328,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC002,RDC002,2218,0.85,910.65,1.500676,606,323,100,800,323,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC003,RDC001,1806,0.85,1054.95,1.48695,709,260,100,800,260,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC004,RDC002,2052,0.85,1103.05,1.531807,720,313,100,800,313,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC005,RDC001,2291,0.85,854.75,1.491101,573,470,100,800,470,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC006,RDC002,1630,0.85,906.75,1.484036,611,206,100,800,206,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC007,RDC001,2246,0.85,1127.1,1.510342,746,331,100,800,331,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC008,RDC002,2096,0.85,852.8,1.508736,565,298,100,800,298,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC009,RDC001,2201,0.85,780.0,1.515135,514,443,100,800,443,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC010,RDC002,2020,0.85,930.15,1.49202,623,269,100,800,269,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC011,RDC001,2080,0.85,922.35,1.515882,608,297,100,800,297,coverage,2026-04-04,2026-06-02
+exp_assortment_v001_topk,v001,candidate_pool_v001,k_rule_v001,2026-06-02,2026-06-03,2026-06-29,FDC012,RDC002,2097,0.85,861.25,1.440217,598,313,100,800,313,coverage,2026-04-04,2026-06-02

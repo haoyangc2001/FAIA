@@ -1,0 +1,113 @@
+version: v001
+table: k_table
+description: 每个 FDC、anchor_date 的选品数量上限和计算来源。
+primary_key:
+  - experiment_id
+  - anchor_date
+  - fdc_id
+foreign_keys:
+  - field: fdc_id
+    references: warehouse_master.node_id
+  - field: rdc_id
+    references: warehouse_master.node_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 选品实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: candidate_pool_version
+    type: string
+    nullable: false
+    description: 候选池生成规则版本。
+  - name: k_rule_version
+    type: string
+    nullable: false
+    description: K 值计算规则版本。
+  - name: anchor_date
+    type: date
+    nullable: false
+    description: 选品决策日期。
+  - name: effective_start_date
+    type: date
+    nullable: false
+    description: K 值开始生效日期。
+  - name: effective_end_date
+    type: date
+    nullable: false
+    description: K 值结束生效日期。
+  - name: fdc_id
+    type: string
+    nullable: false
+    description: 前置仓 ID。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: FDC 所属 RDC。
+  - name: candidate_sku_count
+    type: integer
+    nullable: false
+    description: 当前 FDC 的候选 SKU 数。
+  - name: target_order_coverage
+    type: float
+    nullable: false
+    description: 期望覆盖的历史订单比例。
+  - name: capacity_volume_limit
+    type: float
+    nullable: false
+    description: 可用于选品的 FDC 体积容量上限。
+  - name: avg_selected_sku_volume
+    type: float
+    nullable: false
+    description: 用于估算 K 的候选 SKU 平均体积。
+  - name: physical_capacity_k
+    type: integer
+    nullable: false
+    description: 由物理容量估算得到的 SKU 数上限。
+  - name: coverage_target_k
+    type: integer
+    nullable: false
+    description: 由历史订单覆盖目标估算得到的 SKU 数。
+  - name: min_k
+    type: integer
+    nullable: false
+    description: 业务允许的最小 K。
+  - name: max_k
+    type: integer
+    nullable: false
+    description: 业务允许的最大 K。
+  - name: selected_k
+    type: integer
+    nullable: false
+    description: 最终用于选品的 K 值。
+  - name: k_source
+    type: string
+    nullable: false
+    allowed_values: [capacity, coverage, manual, default, clipped]
+    description: selected_k 的主要来源。
+  - name: historical_window_start
+    type: date
+    nullable: false
+    description: K 计算使用的历史窗口开始日期。
+  - name: historical_window_end
+    type: date
+    nullable: false
+    description: K 计算使用的历史窗口结束日期。
+constraints:
+  - effective_start_date > anchor_date
+  - effective_end_date >= effective_start_date
+  - historical_window_end <= anchor_date
+  - candidate_sku_count >= 0
+  - target_order_coverage between 0 and 1
+  - capacity_volume_limit > 0
+  - avg_selected_sku_volume > 0
+  - physical_capacity_k >= 0
+  - coverage_target_k >= 0
+  - min_k >= 0
+  - max_k >= min_k
+  - selected_k >= min_k
+  - selected_k <= max_k
+  - selected_k <= candidate_sku_count

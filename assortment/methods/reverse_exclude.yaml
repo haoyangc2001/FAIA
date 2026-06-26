@@ -1,0 +1,10 @@
+method_version: reverse_exclude_v001
+method_name: reverse_exclude
+description: 从候选全集开始，基于历史订单 basket 的完整覆盖影响逐步删除结构价值最低的 SKU。
+score_field: structure_score
+tie_break_fields:
+  - historical_order_count
+  - future_promo_score
+  - static_priority_score
+outputs:
+  - reverse_exclude_result.csv

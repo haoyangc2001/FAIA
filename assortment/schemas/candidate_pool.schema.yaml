@@ -1,0 +1,135 @@
+version: v001
+table: candidate_pool
+description: 每个 FDC、anchor_date 下可参与选品排序的候选 SKU 池。
+primary_key:
+  - experiment_id
+  - anchor_date
+  - fdc_id
+  - sku_id
+foreign_keys:
+  - field: fdc_id
+    references: warehouse_master.node_id
+  - field: rdc_id
+    references: warehouse_master.node_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 选品实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: candidate_pool_version
+    type: string
+    nullable: false
+    description: 候选池生成规则版本。
+  - name: anchor_date
+    type: date
+    nullable: false
+    description: 选品决策日期，只允许使用该日期及之前的历史真实需求。
+  - name: effective_start_date
+    type: date
+    nullable: false
+    description: 选品结果开始生效日期。
+  - name: effective_end_date
+    type: date
+    nullable: false
+    description: 选品结果结束生效日期。
+  - name: fdc_id
+    type: string
+    nullable: false
+    description: 前置仓 ID。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: FDC 所属 RDC。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: eligible_flag
+    type: boolean
+    nullable: false
+    description: SKU-FDC 是否满足基础可履约关系。
+  - name: candidate_flag
+    type: boolean
+    nullable: false
+    description: 是否进入当前实验候选池。
+  - name: filter_reason
+    type: string
+    nullable: true
+    description: 未进入候选池的原因，例如 ineligible、inactive、oversize、non_regular。
+  - name: recall_source
+    type: string
+    nullable: false
+    allowed_values: [historical_demand, promotion, new_product, strategic, co_purchase, base_pool]
+    description: SKU 被召回进入候选池的主要来源。
+  - name: category_id
+    type: string
+    nullable: false
+    description: 类目 ID。
+  - name: brand_id
+    type: string
+    nullable: false
+    description: 品牌 ID。
+  - name: temperature_zone
+    type: string
+    nullable: false
+    allowed_values: [ambient, chilled, frozen]
+    description: 商品温层。
+  - name: price
+    type: float
+    nullable: false
+    description: 售价。
+  - name: volume
+    type: float
+    nullable: false
+    description: 单件体积。
+  - name: weight
+    type: float
+    nullable: false
+    description: 单件重量。
+  - name: is_regular_product
+    type: boolean
+    nullable: false
+    description: 是否为常规商品。
+  - name: historical_demand_qty
+    type: integer
+    nullable: false
+    description: 历史窗口内 SKU 需求件数。
+  - name: historical_order_count
+    type: integer
+    nullable: false
+    description: 历史窗口内包含该 SKU 的订单数。
+  - name: active_demand_days
+    type: integer
+    nullable: false
+    description: 历史窗口内产生需求的天数。
+  - name: planned_promo_flag
+    type: boolean
+    nullable: false
+    description: 生效窗口内是否存在已知促销计划。
+  - name: future_promo_score
+    type: float
+    nullable: false
+    description: 基于未来已知促销计划计算的外生召回分。
+  - name: static_priority_score
+    type: float
+    nullable: false
+    description: 基于商品属性、战略 SKU 或新品策略得到的静态优先级分。
+constraints:
+  - effective_start_date > anchor_date
+  - effective_end_date >= effective_start_date
+  - eligible_flag = false 时 candidate_flag = false
+  - candidate_flag = false 时 filter_reason 不为空
+  - historical_demand_qty >= 0
+  - historical_order_count >= 0
+  - active_demand_days >= 0
+  - price >= 0
+  - volume > 0
+  - weight > 0
+  - future_promo_score >= 0
+  - static_priority_score >= 0
