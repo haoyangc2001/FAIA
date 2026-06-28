@@ -1,0 +1,51 @@
+experiment_id: exp_assortment_v001_topk
+created_at: '2026-06-28T20:50:57'
+data_version: v001
+candidate_pool_version: candidate_pool_v001
+k_rule_version: k_rule_v001
+method: hybrid
+method_version: hybrid_v001
+assortment_version: assortment_hybrid_v001
+anchor_date: '2026-06-02'
+effective_start_date: '2026-06-03'
+effective_end_date: '2026-06-29'
+run_dir: assortment/runs/exp_assortment_v001_topk
+publish_config:
+  method: hybrid
+  config_path: assortment/configs/assortment_small.yaml
+inputs:
+  candidate_pool: assortment/runs/exp_assortment_v001_topk/candidate_pool.csv
+  k_table: assortment/runs/exp_assortment_v001_topk/k_table.csv
+  source_result: assortment/runs/exp_assortment_v001_topk/hybrid_result.csv
+  config_snapshot: assortment/runs/exp_assortment_v001_topk/assortment_config.yaml
+outputs:
+  assortment_result:
+    path: assortment/runs/exp_assortment_v001_topk/assortment_result.csv
+    bytes: 810382
+    rows: 3851
+  assortment_manifest: assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml
+  assortment_metrics: assortment/runs/exp_assortment_v001_topk/assortment_metrics.json
+  assortment_report: assortment/reports/exp_assortment_v001_topk_assortment_report.md
+  validation_summary:
+    path: assortment/runs/exp_assortment_v001_topk/assortment_validation_summary.json
+    bytes: 1655
+  validation_report:
+    path: assortment/reports/exp_assortment_v001_topk_assortment_validation_report.md
+    bytes: 1157
+row_counts:
+  assortment_result: 3851
+version_lineage:
+  experiment_id: exp_assortment_v001_topk
+  data_version: v001
+  candidate_pool_version: candidate_pool_v001
+  k_rule_version: k_rule_v001
+  method: hybrid
+  method_version: hybrid_v001
+  assortment_version: assortment_hybrid_v001
+replay_command: PYTHONPATH=. python3 assortment/scripts/run_assortment.py --config
+  assortment/configs/assortment_small.yaml
+validation:
+  passed: true
+  checked_at: '2026-06-28T20:59:06'
+  validation_summary: assortment/runs/exp_assortment_v001_topk/assortment_validation_summary.json
+  validation_report: assortment/reports/exp_assortment_v001_topk_assortment_validation_report.md

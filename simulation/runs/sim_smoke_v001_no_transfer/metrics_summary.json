@@ -7,14 +7,14 @@
   "simulation_start_date": "2026-06-03",
   "simulation_end_date": "2026-06-29",
   "total_demand_qty": 298426,
-  "fdc_fulfilled_qty": 994,
-  "rdc_fallback_qty": 13669,
-  "lost_sales_qty": 283763,
-  "fdc_fulfillment_rate": 0.00333081,
-  "loss_ratio": 0.95086554,
+  "fdc_fulfilled_qty": 1000,
+  "rdc_fallback_qty": 13637,
+  "lost_sales_qty": 283789,
+  "fdc_fulfillment_rate": 0.00335091,
+  "loss_ratio": 0.95095266,
   "transfer_cost": 0.0,
-  "rdc_fallback_cost": 16402.8,
-  "lost_sales_cost": 1418815.0,
-  "holding_cost": 8946.78,
-  "total_cost": 1444164.58
+  "rdc_fallback_cost": 16364.4,
+  "lost_sales_cost": 1418945.0,
+  "holding_cost": 8931.66,
+  "total_cost": 1444241.06
 }

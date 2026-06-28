@@ -1,0 +1,85 @@
+version: v001
+artifact: evaluation_manifest
+description: 综合评估运行 manifest 契约，固定同一次 evaluation 的实验协议、上游 manifest 来源、输出产物和复现命令。
+primary_key:
+  - evaluation_id
+required_fields:
+  - evaluation_id
+  - evaluation_version
+  - status
+  - config
+  - run_dir
+  - protocol
+  - manifest_sources
+  - expected_outputs
+  - replay_command
+fields:
+  - name: evaluation_id
+    type: string
+    nullable: false
+    description: 综合评估 ID。
+  - name: evaluation_version
+    type: string
+    nullable: false
+    description: 评估协议版本。
+  - name: created_at
+    type: datetime
+    nullable: true
+    description: manifest 创建时间。
+  - name: status
+    type: string
+    nullable: false
+    allowed_values: [protocol_defined, collected, reported, validated, failed]
+    description: evaluation 当前状态。
+  - name: config
+    type: path
+    nullable: false
+    description: 生成本次 evaluation 的配置路径。
+  - name: run_dir
+    type: path
+    nullable: false
+    description: evaluation 运行输出目录。
+  - name: replay_command
+    type: string
+    nullable: false
+    description: 复现本次 evaluation 的命令。
+sections:
+  - name: protocol
+    nullable: false
+    description: 同一次 evaluation 中必须统一的可比性协议。
+    required_fields:
+      - data_version
+      - split_version
+      - evaluation_split
+      - evaluation_window
+      - assortment_version
+      - inventory_version
+      - simulation_rule_version
+      - cost_config_version
+  - name: protocol.evaluation_window
+    nullable: false
+    required_fields:
+      - start_date
+      - end_date
+    description: 指标汇总和比较使用的闭区间日期窗口。
+  - name: manifest_sources
+    nullable: false
+    description: 被纳入或声明纳入本次 evaluation 的上游 manifest 列表，按 data、assortment、simulation、inventory 分组。
+  - name: expected_outputs
+    nullable: false
+    description: 后续收集、对比、报告和校验步骤应写出的产物路径。
+  - name: outputs
+    nullable: true
+    description: 已实际生成的产物文件信息，由 5.6-5.8 回填。
+  - name: validation
+    nullable: true
+    description: evaluation 校验状态，由 5.8 回填。
+constraints:
+  - evaluation_window.end_date >= evaluation_window.start_date
+  - protocol.data_version must match collected data, assortment, simulation and inventory manifests unless a run is explicitly marked missing
+  - protocol.split_version must match the selected evaluation window and split manifest
+  - protocol.simulation_rule_version must match all comparable simulation and inventory runs
+  - protocol.cost_config_version must match all comparable cost metrics
+  - missing declared runs must be represented with run_status = missing or not_run in experiment_registry
+  - outputs must not claim generated files before collection, comparison, report or validation steps run
+

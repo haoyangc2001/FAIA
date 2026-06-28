@@ -10,6 +10,7 @@ anchor_date: 2026-06-02
 effective_start_date: 2026-06-03
 effective_end_date: 2026-06-29
 inputs:
+  sku_master: data/synthetic/v001/sku_master.csv
   warehouse_master: data/synthetic/v001/warehouse_master.csv
   orders: data/synthetic/v001/orders.csv
   order_items: data/synthetic/v001/order_items.csv
@@ -66,5 +67,29 @@ hybrid:
     - structure_score
     - future_promo_score
     - static_priority_score
+ml_topk:
+  method_version: ml_topk_v001
+  assortment_version: assortment_ml_topk_v001
+  model_version: ml_topk_linear_v001
+  history_7d_weight: 0.45
+  history_14d_weight: 0.25
+  history_30d_weight: 0.20
+  history_60d_weight: 0.10
+  future_promo_day_weight: 4.0
+  future_campaign_day_weight: 0.25
+  static_priority_weight: 10.0
+  score_precision: 8
+evaluation:
+  enabled: true
+  evaluation_split: test
+  evaluation_start_date: 2026-06-03
+  evaluation_end_date: 2026-06-29
+  methods:
+    - topk
+    - reverse_exclude
+    - hybrid
+    - ml_topk
+publish:
+  method: hybrid
 output:
   run_dir: assortment/runs/exp_assortment_v001_topk

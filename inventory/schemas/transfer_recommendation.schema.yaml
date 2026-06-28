@@ -1,0 +1,182 @@
+version: v001
+table: transfer_recommendation
+description: 库存分配策略输出的 RDC -> FDC 调拨建议，可被 simulation 裁剪和回放。
+primary_key:
+  - experiment_id
+  - inventory_version
+  - transfer_id
+foreign_keys:
+  - field: rdc_id
+    references: warehouse_master.node_id
+  - field: fdc_id
+    references: warehouse_master.node_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 库存分配实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: assortment_version
+    type: string
+    nullable: false
+    description: 使用的选品结果版本。
+  - name: inventory_version
+    type: string
+    nullable: false
+    description: 库存分配结果版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: false
+    description: 对齐的仿真规则版本。
+  - name: policy_name
+    type: string
+    nullable: false
+    allowed_values: [no_transfer, historical_mean, base_stock, parameter_search, greedy_allocation, model]
+    description: 库存策略名称。
+  - name: policy_version
+    type: string
+    nullable: false
+    description: 库存策略版本。
+  - name: model_version
+    type: string
+    nullable: false
+    description: 模型版本；规则 baseline 使用 none。
+  - name: run_date
+    type: date
+    nullable: false
+    description: 本次运行日期。
+  - name: decision_date
+    type: date
+    nullable: false
+    description: 生成调拨建议的决策日期。
+  - name: effective_date
+    type: date
+    nullable: false
+    description: 建议调拨开始生效日期。
+  - name: transfer_id
+    type: string
+    nullable: false
+    description: 调拨建议唯一 ID。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: 发货 RDC。
+  - name: fdc_id
+    type: string
+    nullable: false
+    description: 收货 FDC。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: demand_forecast_qty
+    type: float
+    nullable: false
+    description: 策略使用的预测需求量。
+  - name: safety_stock_qty
+    type: integer
+    nullable: false
+    description: 安全库存 SS。
+  - name: target_inventory_qty
+    type: integer
+    nullable: false
+    description: 目标库存 TI。
+  - name: current_inventory_qty
+    type: integer
+    nullable: false
+    description: 当前 FDC on-hand 库存。
+  - name: pipeline_inventory_qty
+    type: integer
+    nullable: false
+    description: 当前 FDC 在途库存。
+  - name: inventory_position_qty
+    type: integer
+    nullable: false
+    description: FDC 当前库存位置。
+  - name: rdc_on_hand_qty
+    type: integer
+    nullable: false
+    description: RDC 当前 on-hand 库存。
+  - name: rdc_reserved_qty
+    type: integer
+    nullable: false
+    description: RDC 自留库存。
+  - name: rdc_allocatable_qty
+    type: integer
+    nullable: false
+    description: RDC 可用于 FDC 调拨的库存。
+  - name: priority_score
+    type: float
+    nullable: false
+    description: RDC 库存不足时的分配优先级分。
+  - name: recommended_transfer_qty
+    type: integer
+    nullable: false
+    description: 策略建议调拨量。
+  - name: actual_transfer_qty
+    type: integer
+    nullable: true
+    description: 已经过库存模块或 simulation 裁剪后的实际调拨量；纯建议阶段可为空。
+  - name: clipped_qty
+    type: integer
+    nullable: true
+    description: 被裁剪掉的调拨量；纯建议阶段可为空。
+  - name: clip_reason
+    type: string
+    nullable: true
+    description: 调拨被裁剪或取消的原因。
+  - name: ship_date
+    type: date
+    nullable: false
+    description: 建议发货日期。
+  - name: arrival_date
+    type: date
+    nullable: false
+    description: 预计到货日期。
+  - name: lead_time_days
+    type: integer
+    nullable: false
+    description: 调拨提前期。
+  - name: status
+    type: string
+    nullable: false
+    allowed_values: [recommended, planned, clipped, shipped, cancelled]
+    description: 调拨建议状态。
+  - name: reason
+    type: string
+    nullable: true
+    description: 策略生成该建议的业务原因。
+  - name: assortment_mask
+    type: boolean
+    nullable: false
+    description: SKU-FDC 是否进入当前 assortment。
+  - name: eligible_mask
+    type: boolean
+    nullable: false
+    description: SKU-FDC 是否业务可履约、可售或可调拨。
+constraints:
+  - effective_date >= decision_date
+  - demand_forecast_qty >= 0
+  - safety_stock_qty >= 0
+  - target_inventory_qty >= safety_stock_qty
+  - current_inventory_qty >= 0
+  - pipeline_inventory_qty >= 0
+  - inventory_position_qty = current_inventory_qty + pipeline_inventory_qty
+  - rdc_on_hand_qty >= 0
+  - rdc_reserved_qty >= 0
+  - rdc_allocatable_qty >= 0
+  - priority_score >= 0
+  - recommended_transfer_qty >= 0
+  - actual_transfer_qty 为空或 actual_transfer_qty >= 0
+  - clipped_qty 为空或 clipped_qty >= 0
+  - actual_transfer_qty 不为空时 recommended_transfer_qty = actual_transfer_qty + clipped_qty
+  - actual_transfer_qty 不为空时 actual_transfer_qty <= rdc_allocatable_qty
+  - lead_time_days >= 0
+  - arrival_date >= ship_date
+  - assortment_mask = false 时 recommended_transfer_qty = 0
+  - eligible_mask = false 时 recommended_transfer_qty = 0

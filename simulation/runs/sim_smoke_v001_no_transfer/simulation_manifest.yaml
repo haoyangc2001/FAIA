@@ -1,5 +1,5 @@
 experiment_id: sim_smoke_v001_no_transfer
-created_at: '2026-06-26T13:36:25'
+created_at: '2026-06-28T20:52:35'
 data_version: v001
 assortment_version: assortment_v001
 policy_version: no_transfer_v001
@@ -30,13 +30,13 @@ version_lineage:
   rules_path: simulation/rules/simulation_rule_v001.yaml
 initialization:
   initial_inventory_rows: 23530
-  initial_pipeline_events: 52
-  initial_pipeline_qty: 103
+  initial_pipeline_events: 55
+  initial_pipeline_qty: 114
 row_counts:
   daily_state: 635310
   transfer_result: 0
   fulfillment_result: 99442
-  cost_result: 179390
+  cost_result: 179300
 metrics_summary:
   experiment_id: sim_smoke_v001_no_transfer
   data_version: v001
@@ -46,20 +46,20 @@ metrics_summary:
   simulation_start_date: '2026-06-03'
   simulation_end_date: '2026-06-29'
   total_demand_qty: 298426
-  fdc_fulfilled_qty: 994
-  rdc_fallback_qty: 13669
-  lost_sales_qty: 283763
-  fdc_fulfillment_rate: 0.00333081
-  loss_ratio: 0.95086554
+  fdc_fulfilled_qty: 1000
+  rdc_fallback_qty: 13637
+  lost_sales_qty: 283789
+  fdc_fulfillment_rate: 0.00335091
+  loss_ratio: 0.95095266
   transfer_cost: 0.0
-  rdc_fallback_cost: 16402.8
-  lost_sales_cost: 1418815.0
-  holding_cost: 8946.78
-  total_cost: 1444164.58
+  rdc_fallback_cost: 16364.4
+  lost_sales_cost: 1418945.0
+  holding_cost: 8931.66
+  total_cost: 1444241.06
 outputs:
   daily_state:
     path: simulation/runs/sim_smoke_v001_no_transfer/daily_state.csv
-    bytes: 67346543
+    bytes: 67346498
     rows: 635310
   transfer_result:
     path: simulation/runs/sim_smoke_v001_no_transfer/transfer_result.csv
@@ -71,34 +71,34 @@ outputs:
     rows: 99442
   cost_result:
     path: simulation/runs/sim_smoke_v001_no_transfer/cost_result.csv
-    bytes: 21037133
-    rows: 179390
+    bytes: 21026558
+    rows: 179300
   metrics_summary:
     path: simulation/runs/sim_smoke_v001_no_transfer/metrics_summary.json
-    bytes: 611
+    bytes: 612
   daily_log:
     path: simulation/runs/sim_smoke_v001_no_transfer/daily_log.json
-    bytes: 12625
+    bytes: 12630
     rows: 27
   simulation_config:
     path: simulation/runs/sim_smoke_v001_no_transfer/simulation_config.yaml
     bytes: 906
   report:
     path: simulation/reports/sim_smoke_v001_no_transfer_simulation_report.md
-    bytes: 4117
+    bytes: 4118
   simulation_manifest:
     path: simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml
-    bytes: 3738
+    bytes: 3739
   validation_summary:
     path: simulation/runs/sim_smoke_v001_no_transfer/validation_summary.json
-    bytes: 2634
+    bytes: 2636
   validation_report:
     path: simulation/reports/sim_smoke_v001_no_transfer_validation_report.md
-    bytes: 1875
+    bytes: 1876
 replay_command: PYTHONPATH=. python3 simulation/scripts/run_simulation.py --config
   simulation/configs/simulation_small.yaml
 validation:
   passed: true
-  checked_at: '2026-06-26T13:40:14'
+  checked_at: '2026-06-28T20:59:58'
   validation_summary: simulation/runs/sim_smoke_v001_no_transfer/validation_summary.json
   validation_report: simulation/reports/sim_smoke_v001_no_transfer_validation_report.md

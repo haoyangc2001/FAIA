@@ -1,0 +1,113 @@
+version: v001
+table: comparison_table
+description: Baseline 对比矩阵契约，按选品方法、库存方法和组合实验汇总可用状态和主指标。
+primary_key:
+  - evaluation_id
+  - comparison_type
+  - comparison_id
+fields:
+  - name: evaluation_id
+    type: string
+    nullable: false
+    description: 综合评估 ID。
+  - name: comparison_type
+    type: string
+    nullable: false
+    allowed_values: [assortment_method, inventory_method, combination]
+    description: 对比对象类型。
+  - name: comparison_id
+    type: string
+    nullable: false
+    description: 对比项 ID。
+  - name: run_status
+    type: string
+    nullable: false
+    allowed_values: [available, missing, not_run, planned, future, missing_inventory_run]
+    description: 对比项当前产物状态。
+  - name: metrics_status
+    type: string
+    nullable: false
+    allowed_values: [available, partial, missing]
+    description: 对比主指标完整状态。
+  - name: method_name
+    type: string
+    nullable: false
+    description: 方法名或组合 ID。
+  - name: method_family
+    type: string
+    nullable: false
+    allowed_values: [baseline, heuristic, ml_model, e2e_model, combination]
+    description: 方法族。
+  - name: assortment_method
+    type: string
+    nullable: true
+    description: 组合中的选品方法。
+  - name: inventory_method
+    type: string
+    nullable: true
+    description: 组合中的库存方法。
+  - name: expected_assortment_version
+    type: string
+    nullable: true
+    description: 配置期望选品版本。
+  - name: observed_assortment_version
+    type: string
+    nullable: true
+    description: 实际收集到的选品版本。
+  - name: expected_inventory_version
+    type: string
+    nullable: true
+    description: 配置期望库存版本。
+  - name: observed_inventory_version
+    type: string
+    nullable: true
+    description: 实际收集到的库存版本。
+  - name: source_experiment_id
+    type: string
+    nullable: true
+    description: 支撑此对比项的上游实验 ID。
+  - name: local_order_fulfillment_rate
+    type: float
+    nullable: true
+    description: 选品本地完整订单覆盖率。
+  - name: sku_frequency_recall_at_k
+    type: float
+    nullable: true
+    description: SKU 频次召回率。
+  - name: ndcg_at_k
+    type: float
+    nullable: true
+    description: 排序质量 NDCG。
+  - name: selected_sku_count
+    type: integer
+    nullable: true
+    description: 选中 SKU-FDC 数。
+  - name: fdc_fulfillment_rate
+    type: float
+    nullable: true
+    description: FDC 本地履约率。
+  - name: loss_ratio
+    type: float
+    nullable: true
+    description: lost sales / total demand。
+  - name: lost_sales_qty
+    type: integer
+    nullable: true
+    description: 缺货量。
+  - name: transfer_cost
+    type: float
+    nullable: true
+    description: 调拨成本。
+  - name: total_cost
+    type: float
+    nullable: true
+    description: 总成本。
+  - name: notes
+    type: string
+    nullable: true
+    description: 缺失或不可比说明。
+constraints:
+  - ratio metrics must be between 0 and 1 when present
+  - selected_sku_count, lost_sales_qty and cost metrics must be non-negative when present
+  - missing, planned, future or missing_inventory_run rows must include a note or be explicitly declared in baseline_matrix
+

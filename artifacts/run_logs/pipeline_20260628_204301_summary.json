@@ -1,0 +1,351 @@
+{
+  "run_id": "pipeline_20260628_204301",
+  "config": "configs/project.yaml",
+  "repo_root": "/home/tashan/rep/FAIA",
+  "started_at": "2026-06-28T20:43:01",
+  "finished_at": "2026-06-28T20:54:11",
+  "dry_run": false,
+  "status": "passed",
+  "selected_stages": [
+    "data",
+    "assortment",
+    "simulation",
+    "inventory",
+    "evaluation"
+  ],
+  "steps": [
+    {
+      "stage": "data",
+      "step": "generate_synthetic_data",
+      "command": [
+        "python3",
+        "data/scripts/generate_synthetic_data.py",
+        "--config",
+        "data/configs/synthetic_small.yaml",
+        "--data-version",
+        "v001"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:43:01",
+      "finished_at": "2026-06-28T20:45:34",
+      "duration_seconds": 153.569,
+      "stdout_tail": "data_version: v001\nsource_config_data_version: v001_small\nseed: 20260626\nconfig: data/configs/synthetic_small.yaml\nschema_version: v001\ngenerator_version: v001\ncreated_at: '2026-06-28T20:45:34'\noutput_dir: data/synthetic/v001\ncounts:\n  sku_master: 3000\n  warehouse_master: 14\n  sku_fdc_eligibility: 36000\n  calendar: 180\n  promotion_plan: 1948\n  orders: 1234855\n  order_items: 1856325\n  inventory_snapshot: 4235400\n  transfer_plan: 51692\n  stockout_events: 2293194\n  cost_config: 4\n  fdc_date_order_cells: 2160\n  fdc_sku_date_demand_cells: 624438\n",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "data",
+      "step": "build_stage1_artifacts",
+      "command": [
+        "python3",
+        "data/scripts/build_stage1_artifacts.py",
+        "--config",
+        "data/configs/synthetic_small.yaml",
+        "--data-version",
+        "v001"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:45:34",
+      "finished_at": "2026-06-28T20:48:08",
+      "duration_seconds": 154.054,
+      "stdout_tail": "{\n  \"processed\": {\n    \"data_version\": \"v001\",\n    \"source_synthetic_dir\": \"data/synthetic/v001\",\n    \"created_at\": \"2026-06-28T20:48:08\",\n    \"counts\": {\n      \"fdc_sku_daily_demand\": 624438,\n      \"order_type_table\": 274420,\n      \"order_type_items\": 695935,\n      \"inventory_daily_state\": 4235400,\n      \"candidate_pool_base\": 32734\n    }\n  },\n  \"features\": {\n    \"ml_topk_fdc_sku_features\": 98202,\n    \"inventory_features\": 52590\n  },\n  \"splits\": {\n    \"data_version\": \"v001\",\n    \"created_at\": \"2026-06-28T20:45:35\",\n    \"split_method\": \"chronological\",\n    \"counts\": {\n      \"train_dates\": 126,\n      \"val_dates\": 27,\n      \"test_dates\": 27\n    },\n    \"ranges\": {\n      \"train\": [\n        \"2026-01-01\",\n        \"2026-05-06\"\n      ],\n      \"validation\": [\n        \"2026-05-07\",\n        \"2026-06-02\"\n      ],\n      \"test\": [\n        \"2026-06-03\",\n        \"2026-06-29\"\n      ]\n    }\n  }\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "data",
+      "step": "validate_stage1_data",
+      "command": [
+        "python3",
+        "data/scripts/validate_stage1_data.py",
+        "--data-version",
+        "v001"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:48:08",
+      "finished_at": "2026-06-28T20:50:22",
+      "duration_seconds": 133.722,
+      "stdout_tail": "{\n  \"data_version\": \"v001\",\n  \"overall_status\": \"PASS\",\n  \"total_checks\": 58,\n  \"failed_checks\": 0,\n  \"warnings\": 0,\n  \"report_path\": \"data/validation/reports/v001_validation_report.md\",\n  \"summary_path\": \"data/validation/reports/v001_validation_summary.json\"\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "data",
+      "step": "register_data_version",
+      "command": [
+        "python3",
+        "data/scripts/register_data_version.py",
+        "--data-version",
+        "v001",
+        "--config",
+        "data/configs/synthetic_small.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:50:22",
+      "finished_at": "2026-06-28T20:50:22",
+      "duration_seconds": 0.268,
+      "stdout_tail": "version_manifest: data/versions/v001/manifest.yaml\nregistry: data/versions/version_registry.yaml\nstatus: validated\n",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "assortment",
+      "step": "run_assortment",
+      "command": [
+        "python3",
+        "assortment/scripts/run_assortment.py",
+        "--config",
+        "assortment/configs/assortment_small.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:50:22",
+      "finished_at": "2026-06-28T20:51:21",
+      "duration_seconds": 58.114,
+      "stdout_tail": "        \"covered_regular_order_count\": 119892,\n        \"local_order_fulfillment_rate\": 0.75418003,\n        \"fdc_count\": 12,\n        \"selected_sku_count\": 3851,\n        \"candidate_sku_count\": 24963,\n        \"sku_frequency_recall_at_k\": 0.81028481,\n        \"ndcg_at_k\": 0.98351548,\n        \"candidate_hit_rate\": 0.92786096,\n        \"avg_selected_k\": 320.916667,\n        \"avg_candidate_count\": 2080.25\n      },\n      {\n        \"method\": \"hybrid\",\n        \"assortment_version\": \"assortment_hybrid_v001\",\n        \"regular_order_count\": 158970,\n        \"covered_regular_order_count\": 119838,\n        \"local_order_fulfillment_rate\": 0.75384035,\n        \"fdc_count\": 12,\n        \"selected_sku_count\": 3851,\n        \"candidate_sku_count\": 24963,\n        \"sku_frequency_recall_at_k\": 0.81020396,\n        \"ndcg_at_k\": 0.98349106,\n        \"candidate_hit_rate\": 0.92786096,\n        \"avg_selected_k\": 320.916667,\n        \"avg_candidate_count\": 2080.25\n      },\n      {\n        \"method\": \"topk\",\n        \"assortment_version\": \"assortment_topk_v001\",\n        \"regular_order_count\": 158970,\n        \"covered_regular_order_count\": 119698,\n        \"local_order_fulfillment_rate\": 0.75295968,\n        \"fdc_count\": 12,\n        \"selected_sku_count\": 3851,\n        \"candidate_sku_count\": 24963,\n        \"sku_frequency_recall_at_k\": 0.80953023,\n        \"ndcg_at_k\": 0.98326199,\n        \"candidate_hit_rate\": 0.92786096,\n        \"avg_selected_k\": 320.916667,\n        \"avg_candidate_count\": 2080.25\n      }\n    ],\n    \"outputs\": {\n      \"assortment_metrics\": \"assortment/runs/exp_assortment_v001_topk/assortment_metrics.json\",\n      \"assortment_report\": \"assortment/reports/exp_assortment_v001_topk_assortment_report.md\"\n    },\n    \"skipped\": false,\n    \"reason\": \"\"\n  },\n  \"validation_summary\": {\n    \"passed\": true,\n    \"metrics\": {\n      \"assortment_result_rows\": 3851,\n      \"row_errors\": 0,\n      \"fdc_count\": 12,\n      \"total_selected_rows\": 3851,\n      \"group_errors\": 0\n    },\n    \"outputs\": {\n      \"validation_summary\": \"assortment/runs/exp_assortment_v001_topk/assortment_validation_summary.json\",\n      \"validation_report\": \"assortment/reports/exp_assortment_v001_topk_assortment_validation_report.md\"\n    }\n  },\n  \"outputs\": {\n    \"candidate_pool\": \"assortment/runs/exp_assortment_v001_topk/candidate_pool.csv\",\n    \"k_table\": \"assortment/runs/exp_assortment_v001_topk/k_table.csv\",\n    \"topk_result\": \"assortment/runs/exp_assortment_v001_topk/topk_result.csv\",\n    \"reverse_exclude_result\": \"assortment/runs/exp_assortment_v001_topk/reverse_exclude_result.csv\",\n    \"hybrid_result\": \"assortment/runs/exp_assortment_v001_topk/hybrid_result.csv\",\n    \"ml_topk_result\": \"assortment/runs/exp_assortment_v001_topk/ml_topk_result.csv\",\n    \"ml_topk_model_manifest\": \"assortment/runs/exp_assortment_v001_topk/ml_topk_model_manifest.yaml\",\n    \"assortment_result\": \"assortment/runs/exp_assortment_v001_topk/assortment_result.csv\",\n    \"assortment_manifest\": \"assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml\",\n    \"assortment_metrics\": \"assortment/runs/exp_assortment_v001_topk/assortment_metrics.json\",\n    \"assortment_report\": \"assortment/reports/exp_assortment_v001_topk_assortment_report.md\",\n    \"assortment_validation_summary\": \"assortment/runs/exp_assortment_v001_topk/assortment_validation_summary.json\",\n    \"assortment_validation_report\": \"assortment/reports/exp_assortment_v001_topk_assortment_validation_report.md\",\n    \"run_manifest\": \"assortment/runs/exp_assortment_v001_topk/run_manifest.yaml\"\n  }\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "assortment",
+      "step": "evaluate_assortment",
+      "command": [
+        "python3",
+        "assortment/scripts/evaluate_assortment.py",
+        "--config",
+        "assortment/configs/assortment_small.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:51:21",
+      "finished_at": "2026-06-28T20:51:45",
+      "duration_seconds": 24.214,
+      "stdout_tail": "      \"local_order_fulfillment_rate\": 0.7918823,\n      \"selected_sku_count\": 313,\n      \"candidate_sku_count\": 2097,\n      \"sku_frequency_recall_at_k\": 0.83839618,\n      \"ndcg_at_k\": 0.98097762,\n      \"candidate_hit_rate\": 0.92514036,\n      \"metric_level\": \"fdc\",\n      \"metric_key\": \"FDC012\",\n      \"fdc_count\": 1,\n      \"avg_selected_k\": 313,\n      \"avg_candidate_count\": 2097\n    }\n  ],\n  \"comparison\": [\n    {\n      \"method\": \"ml_topk\",\n      \"assortment_version\": \"assortment_ml_topk_v001\",\n      \"regular_order_count\": 158970,\n      \"covered_regular_order_count\": 125928,\n      \"local_order_fulfillment_rate\": 0.79214946,\n      \"fdc_count\": 12,\n      \"selected_sku_count\": 3851,\n      \"candidate_sku_count\": 24963,\n      \"sku_frequency_recall_at_k\": 0.83838411,\n      \"ndcg_at_k\": 0.98031186,\n      \"candidate_hit_rate\": 0.92786096,\n      \"avg_selected_k\": 320.916667,\n      \"avg_candidate_count\": 2080.25\n    },\n    {\n      \"method\": \"reverse_exclude\",\n      \"assortment_version\": \"assortment_reverse_exclude_v001\",\n      \"regular_order_count\": 158970,\n      \"covered_regular_order_count\": 119892,\n      \"local_order_fulfillment_rate\": 0.75418003,\n      \"fdc_count\": 12,\n      \"selected_sku_count\": 3851,\n      \"candidate_sku_count\": 24963,\n      \"sku_frequency_recall_at_k\": 0.81028481,\n      \"ndcg_at_k\": 0.98351548,\n      \"candidate_hit_rate\": 0.92786096,\n      \"avg_selected_k\": 320.916667,\n      \"avg_candidate_count\": 2080.25\n    },\n    {\n      \"method\": \"hybrid\",\n      \"assortment_version\": \"assortment_hybrid_v001\",\n      \"regular_order_count\": 158970,\n      \"covered_regular_order_count\": 119838,\n      \"local_order_fulfillment_rate\": 0.75384035,\n      \"fdc_count\": 12,\n      \"selected_sku_count\": 3851,\n      \"candidate_sku_count\": 24963,\n      \"sku_frequency_recall_at_k\": 0.81020396,\n      \"ndcg_at_k\": 0.98349106,\n      \"candidate_hit_rate\": 0.92786096,\n      \"avg_selected_k\": 320.916667,\n      \"avg_candidate_count\": 2080.25\n    },\n    {\n      \"method\": \"topk\",\n      \"assortment_version\": \"assortment_topk_v001\",\n      \"regular_order_count\": 158970,\n      \"covered_regular_order_count\": 119698,\n      \"local_order_fulfillment_rate\": 0.75295968,\n      \"fdc_count\": 12,\n      \"selected_sku_count\": 3851,\n      \"candidate_sku_count\": 24963,\n      \"sku_frequency_recall_at_k\": 0.80953023,\n      \"ndcg_at_k\": 0.98326199,\n      \"candidate_hit_rate\": 0.92786096,\n      \"avg_selected_k\": 320.916667,\n      \"avg_candidate_count\": 2080.25\n    }\n  ],\n  \"outputs\": {\n    \"assortment_metrics\": \"assortment/runs/exp_assortment_v001_topk/assortment_metrics.json\",\n    \"assortment_report\": \"assortment/reports/exp_assortment_v001_topk_assortment_report.md\"\n  }\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "assortment",
+      "step": "validate_assortment",
+      "command": [
+        "python3",
+        "assortment/scripts/validate_assortment_run.py",
+        "--manifest",
+        "assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:51:45",
+      "finished_at": "2026-06-28T20:51:46",
+      "duration_seconds": 1.371,
+      "stdout_tail": "{\n  \"experiment_id\": \"exp_assortment_v001_topk\",\n  \"checked_at\": \"2026-06-28T20:51:46\",\n  \"manifest_path\": \"assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml\",\n  \"passed\": true,\n  \"checks\": [\n    {\n      \"name\": \"date_window_valid\",\n      \"passed\": true,\n      \"detail\": \"anchor_date, effective_start_date and effective_end_date are ordered\"\n    },\n    {\n      \"name\": \"required_files_exist\",\n      \"passed\": true,\n      \"detail\": \"all required assortment files exist\",\n      \"metrics\": {\n        \"checked_files\": 4,\n        \"missing_files\": 0\n      }\n    },\n    {\n      \"name\": \"assortment_result_header\",\n      \"passed\": true,\n      \"detail\": \"assortment_result header matches schema\",\n      \"metrics\": {\n        \"field_count\": 22\n      }\n    },\n    {\n      \"name\": \"row_counts_match_manifest\",\n      \"passed\": true,\n      \"detail\": \"assortment_result row count matches manifest\",\n      \"metrics\": {\n        \"expected\": 3851,\n        \"actual\": 3851\n      }\n    },\n    {\n      \"name\": \"assortment_result_rows_valid\",\n      \"passed\": true,\n      \"detail\": \"all assortment_result rows satisfy version, candidate and field constraints\",\n      \"metrics\": {\n        \"rows\": 3851,\n        \"error_count\": 0\n      }\n    },\n    {\n      \"name\": \"fdc_group_constraints\",\n      \"passed\": true,\n      \"detail\": \"each FDC has unique SKU rows and continuous rank within K\",\n      \"metrics\": {\n        \"fdc_count\": 12,\n        \"total_selected_rows\": 3851,\n        \"error_count\": 0\n      }\n    }\n  ],\n  \"metrics\": {\n    \"assortment_result_rows\": 3851,\n    \"row_errors\": 0,\n    \"fdc_count\": 12,\n    \"total_selected_rows\": 3851,\n    \"group_errors\": 0\n  },\n  \"manifest_updated\": true\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "simulation",
+      "step": "run_simulation",
+      "command": [
+        "python3",
+        "simulation/scripts/run_simulation.py",
+        "--config",
+        "simulation/configs/simulation_small.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:51:46",
+      "finished_at": "2026-06-28T20:52:35",
+      "duration_seconds": 49.019,
+      "stdout_tail": "{\n  \"experiment_id\": \"sim_smoke_v001_no_transfer\",\n  \"run_dir\": \"simulation/runs/sim_smoke_v001_no_transfer\",\n  \"data_version\": \"v001\",\n  \"assortment_version\": \"assortment_v001\",\n  \"policy_version\": \"no_transfer_v001\",\n  \"simulation_rule_version\": \"sim_rule_v001\",\n  \"row_counts\": {\n    \"daily_state\": 635310,\n    \"transfer_result\": 0,\n    \"fulfillment_result\": 99442,\n    \"cost_result\": 179300\n  },\n  \"metrics_summary\": {\n    \"experiment_id\": \"sim_smoke_v001_no_transfer\",\n    \"data_version\": \"v001\",\n    \"assortment_version\": \"assortment_v001\",\n    \"policy_version\": \"no_transfer_v001\",\n    \"simulation_rule_version\": \"sim_rule_v001\",\n    \"simulation_start_date\": \"2026-06-03\",\n    \"simulation_end_date\": \"2026-06-29\",\n    \"total_demand_qty\": 298426,\n    \"fdc_fulfilled_qty\": 1000,\n    \"rdc_fallback_qty\": 13637,\n    \"lost_sales_qty\": 283789,\n    \"fdc_fulfillment_rate\": 0.00335091,\n    \"loss_ratio\": 0.95095266,\n    \"transfer_cost\": 0.0,\n    \"rdc_fallback_cost\": 16364.4,\n    \"lost_sales_cost\": 1418945.0,\n    \"holding_cost\": 8931.66,\n    \"total_cost\": 1444241.06\n  }\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "simulation",
+      "step": "validate_simulation",
+      "command": [
+        "python3",
+        "simulation/scripts/validate_simulation_run.py",
+        "--manifest",
+        "simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:52:35",
+      "finished_at": "2026-06-28T20:53:31",
+      "duration_seconds": 55.545,
+      "stdout_tail": "      \"name\": \"version_lineage_consistent\",\n      \"passed\": true,\n      \"detail\": \"manifest, config, policy, rules, metrics and CSV outputs share one version lineage\",\n      \"metrics\": {\n        \"error_count\": 0\n      }\n    },\n    {\n      \"name\": \"row_counts_match_manifest\",\n      \"passed\": true,\n      \"detail\": \"CSV row counts match simulation_manifest\",\n      \"metrics\": {\n        \"actual\": {\n          \"daily_state\": 635310,\n          \"transfer_result\": 0,\n          \"fulfillment_result\": 99442,\n          \"cost_result\": 179300\n        },\n        \"expected\": {\n          \"daily_state\": 635310,\n          \"transfer_result\": 0,\n          \"fulfillment_result\": 99442,\n          \"cost_result\": 179300\n        }\n      }\n    },\n    {\n      \"name\": \"non_negative_inventory\",\n      \"passed\": true,\n      \"detail\": \"all inventory quantities are non-negative and position fields are consistent\",\n      \"metrics\": {\n        \"rows\": 635310,\n        \"error_count\": 0\n      }\n    },\n    {\n      \"name\": \"demand_conservation\",\n      \"passed\": true,\n      \"detail\": \"fulfillment rows and metrics_summary satisfy demand conservation\",\n      \"metrics\": {\n        \"rows\": 99442,\n        \"error_count\": 0,\n        \"total_demand_qty\": 298426,\n        \"fdc_fulfilled_qty\": 1000,\n        \"rdc_fallback_qty\": 13637,\n        \"lost_sales_qty\": 283789\n      }\n    },\n    {\n      \"name\": \"transfer_constraints\",\n      \"passed\": true,\n      \"detail\": \"lead time, clipping, RDC-FDC relation and SKU-FDC eligibility constraints pass\",\n      \"metrics\": {\n        \"rows\": 0,\n        \"error_count\": 0,\n        \"actual_transfer_qty\": 0,\n        \"simulation_rule_version\": \"sim_rule_v001\"\n      }\n    },\n    {\n      \"name\": \"inventory_conservation\",\n      \"passed\": true,\n      \"detail\": \"daily on-hand inventory and FDC in-transit quantities reconcile with arrivals, transfers and fulfillment\",\n      \"metrics\": {\n        \"dates_checked\": 27,\n        \"error_count\": 0,\n        \"sample_errors\": []\n      }\n    }\n  ],\n  \"metrics\": {\n    \"total_demand_qty\": 298426,\n    \"fdc_fulfilled_qty\": 1000,\n    \"rdc_fallback_qty\": 13637,\n    \"lost_sales_qty\": 283789,\n    \"inventory_dates_checked\": 27,\n    \"inventory_conservation_errors\": 0\n  },\n  \"manifest_updated\": true\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "inventory",
+      "step": "run_inventory_baseline",
+      "command": [
+        "python3",
+        "inventory/scripts/run_inventory_baseline.py",
+        "--config",
+        "inventory/configs/inventory_small.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:53:31",
+      "finished_at": "2026-06-28T20:54:08",
+      "duration_seconds": 37.533,
+      "stdout_tail": "{'experiment_id': 'exp_inventory_v001_base_stock', 'created_at': '2026-06-28T20:54:08', 'data_version': 'v001', 'assortment_version': 'assortment_hybrid_v001', 'inventory_version': 'inventory_base_stock_v001', 'simulation_rule_version': 'sim_rule_v001', 'policy_name': 'base_stock', 'policy_version': 'inventory_base_stock_v001', 'decision_date': datetime.date(2026, 6, 2), 'effective_start_date': datetime.date(2026, 6, 3), 'effective_end_date': datetime.date(2026, 6, 9), 'row_counts': {'inventory_state': 4875, 'demand_forecast': 34125, 'tiss_result': 4875, 'transfer_recommendation': 3829}, 'outputs': {'inventory_state': {'path': 'inventory/runs/exp_inventory_v001_base_stock/inventory_state.csv', 'bytes': 950367, 'rows': 4875}, 'demand_forecast': {'path': 'inventory/runs/exp_inventory_v001_base_stock/demand_forecast.csv', 'bytes': 9447365, 'rows': 34125}, 'tiss_result': {'path': 'inventory/runs/exp_inventory_v001_base_stock/tiss_result.csv', 'bytes': 1150447, 'rows': 4875}, 'transfer_recommendation': {'path': 'inventory/runs/exp_inventory_v001_base_stock/transfer_recommendation.csv', 'bytes': 1320373, 'rows': 3829}}, 'simulation_status': 'skipped', 'validation_status': 'PASS', 'manifest': 'inventory/runs/exp_inventory_v001_base_stock/inventory_manifest.yaml', 'replay_command': 'PYTHONPATH=. python3 inventory/scripts/run_inventory_baseline.py --config inventory/configs/inventory_small.yaml'}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "inventory",
+      "step": "validate_inventory",
+      "command": [
+        "python3",
+        "inventory/scripts/validate_inventory_run.py",
+        "--manifest",
+        "inventory/runs/exp_inventory_v001_base_stock/inventory_manifest.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:54:08",
+      "finished_at": "2026-06-28T20:54:10",
+      "duration_seconds": 1.897,
+      "stdout_tail": "{\n  \"experiment_id\": \"exp_inventory_v001_base_stock\",\n  \"checked_at\": \"2026-06-28T20:54:10\",\n  \"manifest_path\": \"inventory/runs/exp_inventory_v001_base_stock/inventory_manifest.yaml\",\n  \"passed\": true,\n  \"checks\": [\n    {\n      \"name\": \"required_outputs_exist\",\n      \"passed\": true,\n      \"detail\": \"all declared outputs exist\"\n    },\n    {\n      \"name\": \"row_counts_match\",\n      \"passed\": true,\n      \"detail\": \"all CSV row counts match manifest\"\n    },\n    {\n      \"name\": \"version_lineage_consistent\",\n      \"passed\": true,\n      \"detail\": \"version fields are consistent\"\n    },\n    {\n      \"name\": \"inventory_state_valid\",\n      \"passed\": true,\n      \"detail\": \"errors=0\"\n    },\n    {\n      \"name\": \"demand_forecast_valid\",\n      \"passed\": true,\n      \"detail\": \"errors=0\"\n    },\n    {\n      \"name\": \"tiss_result_valid\",\n      \"passed\": true,\n      \"detail\": \"errors=0\"\n    },\n    {\n      \"name\": \"transfer_recommendation_valid\",\n      \"passed\": true,\n      \"detail\": \"errors=0\"\n    },\n    {\n      \"name\": \"simulation_metrics_valid\",\n      \"passed\": true,\n      \"detail\": \"simulation skipped\"\n    }\n  ],\n  \"metrics\": {\n    \"checked_outputs\": 7\n  },\n  \"manifest_updated\": true\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "evaluation",
+      "step": "collect_results",
+      "command": [
+        "python3",
+        "evaluation/scripts/collect_results.py",
+        "--config",
+        "evaluation/configs/evaluation_default.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:54:10",
+      "finished_at": "2026-06-28T20:54:11",
+      "duration_seconds": 0.589,
+      "stdout_tail": "{\n  \"evaluation_id\": \"eval_v001_baseline\",\n  \"status\": \"collected\",\n  \"row_counts\": {\n    \"experiment_registry\": 4,\n    \"metrics_summary\": 638,\n    \"comparison_table\": 14\n  },\n  \"collection_summary\": {\n    \"available_runs\": 4,\n    \"missing_runs\": 0,\n    \"metric_rows_by_stage\": {\n      \"data\": 14,\n      \"assortment\": 605,\n      \"simulation\": 15,\n      \"inventory\": 4\n    }\n  },\n  \"outputs\": {\n    \"experiment_registry\": {\n      \"path\": \"evaluation/runs/eval_v001_baseline/experiment_registry.csv\",\n      \"bytes\": 2064,\n      \"rows\": 4\n    },\n    \"metrics_summary\": {\n      \"path\": \"evaluation/runs/eval_v001_baseline/metrics_summary.csv\",\n      \"bytes\": 232182,\n      \"rows\": 638\n    },\n    \"comparison_table\": {\n      \"path\": \"evaluation/runs/eval_v001_baseline/comparison_table.csv\",\n      \"bytes\": 3933,\n      \"rows\": 14\n    },\n    \"evaluation_manifest\": {\n      \"path\": \"evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml\",\n      \"bytes\": 4538\n    }\n  }\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "evaluation",
+      "step": "build_evaluation_report",
+      "command": [
+        "python3",
+        "evaluation/scripts/build_report.py",
+        "--manifest",
+        "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:54:11",
+      "finished_at": "2026-06-28T20:54:11",
+      "duration_seconds": 0.238,
+      "stdout_tail": "{\n  \"evaluation_id\": \"eval_v001_baseline\",\n  \"report_path\": \"evaluation/reports/eval_v001_baseline_report.md\",\n  \"registry_rows\": 4,\n  \"metrics_rows\": 638,\n  \"comparison_rows\": 14,\n  \"sections\": [\n    \"protocol\",\n    \"registry\",\n    \"data_metrics\",\n    \"comparison\",\n    \"tradeoff\",\n    \"anomalies\",\n    \"conclusion\"\n  ]\n}",
+      "stderr_tail": ""
+    },
+    {
+      "stage": "evaluation",
+      "step": "validate_evaluation",
+      "command": [
+        "python3",
+        "evaluation/scripts/validate_evaluation_run.py",
+        "--manifest",
+        "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml"
+      ],
+      "status": "passed",
+      "return_code": 0,
+      "started_at": "2026-06-28T20:54:11",
+      "finished_at": "2026-06-28T20:54:11",
+      "duration_seconds": 0.288,
+      "stdout_tail": "      \"passed\": true,\n      \"detail\": \"CSV row counts match evaluation_manifest\",\n      \"metrics\": {\n        \"expected\": {\n          \"experiment_registry\": 4,\n          \"metrics_summary\": 638,\n          \"comparison_table\": 14\n        },\n        \"actual\": {\n          \"experiment_registry\": 4,\n          \"metrics_summary\": 638,\n          \"comparison_table\": 14\n        }\n      }\n    },\n    {\n      \"name\": \"registry_protocol_consistent\",\n      \"passed\": true,\n      \"detail\": \"registry rows share the evaluation protocol\",\n      \"metrics\": {\n        \"error_count\": 0\n      }\n    },\n    {\n      \"name\": \"metric_protocol_consistent\",\n      \"passed\": true,\n      \"detail\": \"metric rows share the evaluation protocol\",\n      \"metrics\": {\n        \"error_count\": 0\n      }\n    },\n    {\n      \"name\": \"required_metrics_present\",\n      \"passed\": true,\n      \"detail\": \"required evaluation metrics are present\",\n      \"metrics\": {\n        \"missing\": []\n      }\n    },\n    {\n      \"name\": \"metric_ranges_valid\",\n      \"passed\": true,\n      \"detail\": \"metric values satisfy ratio and non-negative bounds\",\n      \"metrics\": {\n        \"error_count\": 0\n      }\n    },\n    {\n      \"name\": \"demand_conservation\",\n      \"passed\": true,\n      \"detail\": \"operational demand metrics conserve total demand\",\n      \"metrics\": {\n        \"error_count\": 0\n      }\n    },\n    {\n      \"name\": \"cost_conservation\",\n      \"passed\": true,\n      \"detail\": \"operational cost metrics conserve total cost\",\n      \"metrics\": {\n        \"error_count\": 0\n      }\n    },\n    {\n      \"name\": \"missing_artifacts_explicit\",\n      \"passed\": true,\n      \"detail\": \"missing artifacts are explicitly represented with notes\",\n      \"metrics\": {\n        \"error_count\": 0\n      }\n    }\n  ],\n  \"metrics\": {\n    \"registry_rows\": 4,\n    \"metrics_rows\": 638,\n    \"comparison_rows\": 14,\n    \"failed_checks\": 0\n  },\n  \"manifest_updated\": true\n}",
+      "stderr_tail": ""
+    }
+  ],
+  "stage_outputs": {
+    "data": [
+      {
+        "path": "data/synthetic/v001/manifest.yaml",
+        "exists": true,
+        "bytes": 547
+      },
+      {
+        "path": "data/processed/v001/manifest.yaml",
+        "exists": true,
+        "bytes": 250
+      },
+      {
+        "path": "data/splits/v001/manifest.yaml",
+        "exists": true,
+        "bytes": 282
+      },
+      {
+        "path": "data/versions/v001/manifest.yaml",
+        "exists": true,
+        "bytes": 5802
+      }
+    ],
+    "assortment": [
+      {
+        "path": "assortment/runs/exp_assortment_v001_topk/assortment_result.csv",
+        "exists": true,
+        "bytes": 810382
+      },
+      {
+        "path": "assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml",
+        "exists": true,
+        "bytes": 2108
+      }
+    ],
+    "simulation": [
+      {
+        "path": "simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml",
+        "exists": true,
+        "bytes": 3739
+      },
+      {
+        "path": "simulation/runs/sim_smoke_v001_no_transfer/metrics_summary.json",
+        "exists": true,
+        "bytes": 612
+      }
+    ],
+    "inventory": [
+      {
+        "path": "inventory/runs/exp_inventory_v001_base_stock/inventory_manifest.yaml",
+        "exists": true,
+        "bytes": 3200
+      },
+      {
+        "path": "inventory/runs/exp_inventory_v001_base_stock/transfer_recommendation.csv",
+        "exists": true,
+        "bytes": 1320373
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml",
+        "exists": true,
+        "bytes": 5132
+      },
+      {
+        "path": "evaluation/runs/eval_v001_baseline/experiment_registry.csv",
+        "exists": true,
+        "bytes": 2064
+      },
+      {
+        "path": "evaluation/runs/eval_v001_baseline/metrics_summary.csv",
+        "exists": true,
+        "bytes": 232182
+      },
+      {
+        "path": "evaluation/runs/eval_v001_baseline/comparison_table.csv",
+        "exists": true,
+        "bytes": 3933
+      },
+      {
+        "path": "evaluation/reports/eval_v001_baseline_report.md",
+        "exists": true,
+        "bytes": 3664
+      }
+    ]
+  },
+  "log_path": "artifacts/run_logs/pipeline_20260628_204301.jsonl",
+  "summary_path": "artifacts/run_logs/pipeline_20260628_204301_summary.json"
+}

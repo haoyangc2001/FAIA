@@ -4,7 +4,7 @@ seed: 20260626
 config: data/configs/synthetic_small.yaml
 schema_version: v001
 generator_version: v001
-created_at: '2026-06-26T11:56:31'
+created_at: '2026-06-28T20:45:34'
 output_dir: data/synthetic/v001
 counts:
   sku_master: 3000
@@ -15,8 +15,8 @@ counts:
   orders: 1234855
   order_items: 1856325
   inventory_snapshot: 4235400
-  transfer_plan: 51691
-  stockout_events: 2290830
+  transfer_plan: 51692
+  stockout_events: 2293194
   cost_config: 4
   fdc_date_order_cells: 2160
   fdc_sku_date_demand_cells: 624438

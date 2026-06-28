@@ -1,0 +1,7 @@
+policy_name: base_stock
+policy_version: inventory_base_stock_v001
+description: 基于规则 SS/TI 和库存位置缺口生成 base-stock 补货建议。
+parameters:
+  min_transfer_qty: 1
+  max_transfer_qty_per_sku: 300
+  use_greedy_allocation: true

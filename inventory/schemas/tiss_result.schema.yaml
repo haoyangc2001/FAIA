@@ -1,0 +1,140 @@
+version: v001
+table: tiss_result
+description: 库存分配使用的安全库存 SS 和目标库存 TI 结果，支持 FDC 与 RDC 节点。
+primary_key:
+  - experiment_id
+  - inventory_version
+  - decision_date
+  - node_id
+  - sku_id
+foreign_keys:
+  - field: node_id
+    references: warehouse_master.node_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 库存分配实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: assortment_version
+    type: string
+    nullable: false
+    description: 使用的选品结果版本。
+  - name: inventory_version
+    type: string
+    nullable: false
+    description: 库存分配结果版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: false
+    description: 对齐的仿真规则版本。
+  - name: tiss_version
+    type: string
+    nullable: false
+    description: SS/TI 生成规则或模型版本。
+  - name: model_version
+    type: string
+    nullable: false
+    description: 模型版本；规则 baseline 使用 none。
+  - name: decision_date
+    type: date
+    nullable: false
+    description: 库存策略决策日期。
+  - name: node_id
+    type: string
+    nullable: false
+    description: 生成 SS/TI 的节点 ID。
+  - name: node_type
+    type: string
+    nullable: false
+    allowed_values: [RDC, FDC]
+    description: 仓节点类型。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: 所属或发货 RDC。
+  - name: fdc_id
+    type: string
+    nullable: true
+    description: FDC ID；RDC 节点行可为空。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: demand_forecast_qty
+    type: float
+    nullable: false
+    description: 计算窗口内累计需求预测。
+  - name: forecast_daily_mean_qty
+    type: float
+    nullable: false
+    description: 预测日均需求。
+  - name: historical_demand_std_qty
+    type: float
+    nullable: false
+    description: 历史日需求标准差。
+  - name: lead_time_days
+    type: integer
+    nullable: false
+    description: 调拨提前期。
+  - name: replenishment_window_days
+    type: integer
+    nullable: false
+    description: 目标库存覆盖的补货窗口天数。
+  - name: service_factor
+    type: float
+    nullable: false
+    description: 安全库存服务系数。
+  - name: demand_during_lead_time_qty
+    type: float
+    nullable: false
+    description: lead time 内预测需求。
+  - name: uncertainty_buffer_qty
+    type: float
+    nullable: false
+    description: 需求波动或预测误差缓冲。
+  - name: safety_stock_qty
+    type: integer
+    nullable: false
+    description: 安全库存 SS。
+  - name: target_inventory_qty
+    type: integer
+    nullable: false
+    description: 目标库存 TI。
+  - name: current_inventory_position_qty
+    type: integer
+    nullable: false
+    description: 当前库存位置。
+  - name: assortment_mask
+    type: boolean
+    nullable: false
+    description: FDC-SKU 是否进入当前 assortment；RDC 行可固定为 true。
+  - name: eligible_mask
+    type: boolean
+    nullable: false
+    description: SKU-FDC 是否业务可履约、可售或可调拨。
+  - name: constraint_projection_flag
+    type: boolean
+    nullable: false
+    description: 是否经过约束投影修正。
+constraints:
+  - demand_forecast_qty >= 0
+  - forecast_daily_mean_qty >= 0
+  - historical_demand_std_qty >= 0
+  - lead_time_days >= 0
+  - replenishment_window_days >= 0
+  - service_factor >= 0
+  - demand_during_lead_time_qty >= 0
+  - uncertainty_buffer_qty >= 0
+  - safety_stock_qty >= 0
+  - target_inventory_qty >= safety_stock_qty
+  - current_inventory_position_qty >= 0
+  - node_type = FDC 且 assortment_mask = false 时 safety_stock_qty = 0
+  - node_type = FDC 且 assortment_mask = false 时 target_inventory_qty = 0
+  - node_type = FDC 且 eligible_mask = false 时 safety_stock_qty = 0
+  - node_type = FDC 且 eligible_mask = false 时 target_inventory_qty = 0

@@ -1,0 +1,16 @@
+model_version: ml_topk_linear_v001
+method_version: ml_topk_v001
+assortment_version: assortment_ml_topk_v001
+model_type: deterministic_linear_baseline
+feature_path: data/features/ml_topk/v001/fdc_sku_features.csv
+feature_rows_matched: 24963
+scored_candidate_rows: 24963
+output: assortment/runs/exp_assortment_v001_topk/ml_topk_result.csv
+score_formula:
+  history_7d_weight: 0.45
+  history_14d_weight: 0.25
+  history_30d_weight: 0.2
+  history_60d_weight: 0.1
+  future_promo_day_weight: 4.0
+  future_campaign_day_weight: 0.25
+  static_priority_weight: 10.0

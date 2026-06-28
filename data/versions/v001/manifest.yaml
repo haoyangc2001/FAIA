@@ -1,5 +1,5 @@
 data_version: v001
-registered_at: '2026-06-26T12:42:03'
+registered_at: '2026-06-28T20:50:22'
 status: validated
 source:
   config: data/configs/synthetic_small.yaml
@@ -25,8 +25,8 @@ artifacts:
       orders: 1234855
       order_items: 1856325
       inventory_snapshot: 4235400
-      transfer_plan: 51691
-      stockout_events: 2290830
+      transfer_plan: 51692
+      stockout_events: 2293194
       cost_config: 4
       fdc_date_order_cells: 2160
       fdc_sku_date_demand_cells: 624438
@@ -53,14 +53,14 @@ artifacts:
       bytes: 57295229
       rows: 1856325
     - path: data/synthetic/v001/inventory_snapshot.csv
-      bytes: 165360926
+      bytes: 165360762
       rows: 4235400
     - path: data/synthetic/v001/transfer_plan.csv
-      bytes: 3262350
-      rows: 51691
+      bytes: 3262424
+      rows: 51692
     - path: data/synthetic/v001/stockout_events.csv
-      bytes: 152472766
-      rows: 2290830
+      bytes: 152631274
+      rows: 2293194
     - path: data/synthetic/v001/cost_config.csv
       bytes: 288
       rows: 4
@@ -83,7 +83,7 @@ artifacts:
       bytes: 22269959
       rows: 695935
     - path: data/processed/v001/inventory_daily_state.csv
-      bytes: 182651190
+      bytes: 182650521
       rows: 4235400
     - path: data/processed/v001/candidate_pool_base.csv
       bytes: 3295897
@@ -162,22 +162,22 @@ control_file_checksums:
   sha256: 26c116ce63351a5d6d97a0107e72350a08e6d645cecb549302fb1eb18fd9dbda
 - path: data/synthetic/v001/manifest.yaml
   bytes: 547
-  sha256: 5a85a013672143c7abdd8618b3f4e931c903069463aae667b6cd6d129a606f40
+  sha256: 1d5651dbcf321d9fcb9986502920a4dd9cfe95c00160e61dff48ad3ba0101794
 - path: data/processed/v001/manifest.yaml
   bytes: 250
-  sha256: 1d496be6422b8e9b6c1d1b7b708533698387ad6cc70b7f56ea1b0873da660ceb
+  sha256: 63e751a8290f670da8ec6398d4d5f72dacd8c9b760682be94f402006efc9ba3f
 - path: data/splits/v001/manifest.yaml
   bytes: 282
-  sha256: 3e45ef545a4ec7ca1bb2c55eb0cf419244cb98bea7538c190e622965d74986c8
+  sha256: b746aa805a1ff2c9d3d9130d0ceb229bc224d8f1b7891d29310e8bd7d1c0e700
 - path: data/features/ml_topk/v001/manifest.yaml
   bytes: 146
-  sha256: d4c350ff9b1368a76b99de4823994db513d0f4033d21888eebdf14e740ed5e37
+  sha256: 9ce2c0aa2fe260347c7341a445958c0d43a2dbe9bdc663a4464955a8cb60e292
 - path: data/features/inventory/v001/manifest.yaml
   bytes: 148
-  sha256: 1ba7505189b241f099d45c4fb9d982ecf3ac4c2a245b8cc4fb325f42e576bfb4
+  sha256: c68aa57f6e68f9dc0de1fd215f3ecf654fe867d59fc426df99efcb5f8ad06a92
 - path: data/validation/reports/v001_validation_summary.json
   bytes: 999
-  sha256: dfe0591fdc58390f951b83e408140a241cc24f08f2f3831ff1b5a541a3aa7944
+  sha256: 1322013c1a4f4524a42a229524d58b2a72b62dff35acb6eff2f05b3ef8482ceb
 - path: data/validation/reports/v001_validation_report.md
   bytes: 10530
-  sha256: c7290b3a5f93101ee9210f80f6d02052ff8de994e1015f089378a2c1dc6b3c90
+  sha256: a421d7ec095a9b2e68ef5f635713b07bcfe5d4450d09a282efa35483af38df23

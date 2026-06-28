@@ -195,7 +195,9 @@ created_at: 2026-06-26
 
 ## 当前阶段状态
 
-当前已完成第三阶段前置工作：
+当前第三阶段已完成并通过 v001 端到端验收。`exp_assortment_v001_topk` 会在根目录 `make full` 中运行、评估、校验，并向后续 `inventory/` 和 `evaluation/` 发布 `assortment_hybrid_v001`。
+
+已完成工作：
 
 ```text
 3.1 明确选品系统定位与边界
@@ -206,15 +208,33 @@ created_at: 2026-06-26
 3.6 实现 Top-K baseline
 3.7 实现 Reverse-Exclude
 3.8 实现 Hybrid Selection
+3.9 实现 ML-Top-K 第一版线性 baseline
+3.10 实现选品评估器
+3.11 定义选品结果输出与版本管理
+3.12 实现选品校验与单元测试
 ```
 
 ## 当前运行入口
 
-第一版候选池、K 表、Top-K baseline、Reverse-Exclude 和 Hybrid Selection 可以用下面命令生成：
+第一版候选池、K 表、Top-K baseline、Reverse-Exclude、Hybrid Selection、ML-Top-K、选品评估、结果发布和运行校验可以用下面命令生成：
 
 ```bash
 PYTHONPATH=. python3 assortment/scripts/run_assortment.py \
   --config assortment/configs/assortment_small.yaml
+```
+
+只重算已有选品结果的评估指标时，可以运行：
+
+```bash
+PYTHONPATH=. python3 assortment/scripts/evaluate_assortment.py \
+  --config assortment/configs/assortment_small.yaml
+```
+
+只校验已发布的 `assortment_result.csv` 和 `assortment_manifest.yaml` 时，可以运行：
+
+```bash
+PYTHONPATH=. python3 assortment/scripts/validate_assortment_run.py \
+  --manifest assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml
 ```
 
 当前 smoke run：
@@ -230,6 +250,10 @@ reverse_exclude_method_version: reverse_exclude_v001
 reverse_exclude_assortment_version: assortment_reverse_exclude_v001
 hybrid_method_version: hybrid_v001
 hybrid_assortment_version: assortment_hybrid_v001
+ml_topk_method_version: ml_topk_v001
+ml_topk_assortment_version: assortment_ml_topk_v001
+published_method: hybrid
+published_assortment_version: assortment_hybrid_v001
 anchor_date: 2026-06-02
 effective_window: 2026-06-03 to 2026-06-29
 ```
@@ -248,10 +272,41 @@ k_table.csv: 12
 topk_result.csv: 3851
 reverse_exclude_result.csv: 3851
 hybrid_result.csv: 3851
+ml_topk_result.csv: 3851
+assortment_result.csv: 3851
+assortment_metrics.json: depends on evaluation window
+assortment_validation_summary.json: PASS
 ```
 
 当前 Reverse-Exclude 使用 `2026-04-04` 到 `2026-06-02` 的历史订单 basket，不读取生效窗口 `2026-06-03` 之后的订单，避免未来信息泄漏。
 
 当前 Hybrid Selection 使用交替融合策略，从 Top-K 排序和 Reverse-Exclude 排序中轮流取 SKU，再用 `0.55 * normalized_topk_score + 0.45 * normalized_structure_score` 重新排序。
 
-后续应继续实现 ML-Top-K、评估器、正式 assortment_manifest 和校验测试。
+当前 ML-Top-K 使用 `ml_topk_linear_v001`，以历史订单频次、未来计划促销/活动和静态热度为确定性线性分数，输出 `ml_topk_result.csv` 和 `ml_topk_model_manifest.yaml`。后续可以替换为 LightGBM、线性回归、MLP 或时序模型，但应保持输出字段契约不变。
+
+当前选品评估器会过滤非 regular product 订单，并计算：
+
+```text
+local_order_fulfillment_rate
+sku_frequency_recall_at_k
+ndcg_at_k
+candidate_hit_rate
+coverage_by_order_size
+coverage_by_category
+```
+
+当前发布器默认将 `hybrid_result.csv` 发布为对外稳定的 `assortment_result.csv`，并生成 `assortment_manifest.yaml` 记录数据版本、候选池版本、K 规则版本、方法版本、assortment_version、输入输出路径和复现命令。
+
+当前选品校验器会检查发布时间窗口、必需文件、结果 schema、manifest 行数一致性、SKU-FDC 候选合法性、regular product 约束、source_tag 合法性、selected_k 和 candidate_sku_count 一致性、rank 连续性、SKU 去重和 rank <= K。当前 v001 run 校验结果为 PASS。
+
+最新端到端验收口径：
+
+```text
+pipeline_run_id: pipeline_20260628_204301
+run_assortment: passed
+evaluate_assortment: passed
+validate_assortment: passed
+published_method: hybrid
+published_assortment_version: assortment_hybrid_v001
+assortment_result_rows: 3851
+```

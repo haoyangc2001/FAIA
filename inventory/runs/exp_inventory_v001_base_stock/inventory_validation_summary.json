@@ -1,0 +1,51 @@
+{
+  "experiment_id": "exp_inventory_v001_base_stock",
+  "checked_at": "2026-06-28T21:00:01",
+  "manifest_path": "inventory/runs/exp_inventory_v001_base_stock/inventory_manifest.yaml",
+  "passed": true,
+  "checks": [
+    {
+      "name": "required_outputs_exist",
+      "passed": true,
+      "detail": "all declared outputs exist"
+    },
+    {
+      "name": "row_counts_match",
+      "passed": true,
+      "detail": "all CSV row counts match manifest"
+    },
+    {
+      "name": "version_lineage_consistent",
+      "passed": true,
+      "detail": "version fields are consistent"
+    },
+    {
+      "name": "inventory_state_valid",
+      "passed": true,
+      "detail": "errors=0"
+    },
+    {
+      "name": "demand_forecast_valid",
+      "passed": true,
+      "detail": "errors=0"
+    },
+    {
+      "name": "tiss_result_valid",
+      "passed": true,
+      "detail": "errors=0"
+    },
+    {
+      "name": "transfer_recommendation_valid",
+      "passed": true,
+      "detail": "errors=0"
+    },
+    {
+      "name": "simulation_metrics_valid",
+      "passed": true,
+      "detail": "simulation skipped"
+    }
+  ],
+  "metrics": {
+    "checked_outputs": 7
+  }
+}

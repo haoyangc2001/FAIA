@@ -1,0 +1,135 @@
+version: v001
+table: metrics_summary
+description: 综合评估统一指标长表契约，每行表示一个 stage、experiment、method、level、metric_name 下的单个指标值。
+primary_key:
+  - evaluation_id
+  - stage
+  - experiment_id
+  - method_name
+  - metric_level
+  - metric_key
+  - metric_name
+fields:
+  - name: evaluation_id
+    type: string
+    nullable: false
+    description: 综合评估 ID。
+  - name: stage
+    type: string
+    nullable: false
+    allowed_values: [data, assortment, simulation, inventory]
+    description: 指标来源阶段。
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 上游实验 ID。
+  - name: run_status
+    type: string
+    nullable: false
+    allowed_values: [available, missing, not_run, invalid, skipped]
+    description: 上游实验产物状态。
+  - name: method_name
+    type: string
+    nullable: true
+    description: 方法名，例如 hybrid、base_stock、no_transfer。
+  - name: method_family
+    type: string
+    nullable: true
+    allowed_values: [baseline, heuristic, ml_model, e2e_model, data_artifact, combination, unknown]
+    description: 方法族。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 数据版本。
+  - name: split_version
+    type: string
+    nullable: false
+    description: 时间切分版本。
+  - name: candidate_pool_version
+    type: string
+    nullable: true
+    description: 候选池版本。
+  - name: k_rule_version
+    type: string
+    nullable: true
+    description: K 规则版本。
+  - name: assortment_version
+    type: string
+    nullable: true
+    description: 选品版本。
+  - name: inventory_version
+    type: string
+    nullable: true
+    description: 库存策略版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: true
+    description: 仿真规则版本。
+  - name: cost_config_version
+    type: string
+    nullable: true
+    description: 成本配置版本。
+  - name: policy_version
+    type: string
+    nullable: true
+    description: 策略版本。
+  - name: model_version
+    type: string
+    nullable: true
+    description: 模型版本。
+  - name: evaluation_split
+    type: string
+    nullable: false
+    allowed_values: [train, validation, test]
+    description: 评估切分。
+  - name: evaluation_start_date
+    type: date
+    nullable: false
+    description: 评估窗口开始日期。
+  - name: evaluation_end_date
+    type: date
+    nullable: false
+    description: 评估窗口结束日期。
+  - name: metric_level
+    type: string
+    nullable: false
+    allowed_values: [overall, fdc, rdc, sku, day, category, order_size, temperature_zone]
+    description: 指标聚合层级。
+  - name: metric_key
+    type: string
+    nullable: false
+    description: 指标层级对应 key，例如 ALL、FDC001、SKU001。
+  - name: metric_name
+    type: string
+    nullable: false
+    description: 指标名称。
+  - name: metric_value
+    type: float
+    nullable: false
+    description: 指标数值。计数型指标也使用数值存储。
+  - name: metric_unit
+    type: string
+    nullable: false
+    allowed_values: [count, qty, ratio, cost, value]
+    description: 指标单位。
+  - name: metric_type
+    type: string
+    nullable: false
+    allowed_values: [volume, quality, service, demand, cost, operational]
+    description: 指标类型。
+  - name: source_path
+    type: path
+    nullable: true
+    description: 指标来源文件。
+  - name: notes
+    type: string
+    nullable: true
+    description: 指标来源、缺失或降级说明。
+constraints:
+  - evaluation_end_date >= evaluation_start_date
+  - ratio metrics must be between 0 and 1
+  - count, qty and cost metrics must be non-negative unless explicitly documented otherwise
+  - comparable rows within one evaluation_id should share data_version, split_version, evaluation window, simulation_rule_version and cost_config_version where applicable
+  - simulation and inventory operational rows should satisfy demand conservation when total_demand_qty, fdc_fulfilled_qty, rdc_fallback_qty and lost_sales_qty are present
+  - simulation and inventory cost rows should satisfy cost conservation when all cost components are present
+

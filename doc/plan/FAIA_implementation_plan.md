@@ -1,5 +1,23 @@
 # FAIA 项目从 0 实现计划方案
 
+## 当前实现状态
+
+本文保留为项目的原始实施方案和阶段拆解说明。实际工程状态以 [FAIA_project_plan.json](FAIA_project_plan.json) 和根目录 [README.md](../../README.md) 为准。
+
+截至 2026-06-28，FAIA v001 原型已经完成真实端到端验收：
+
+```text
+Phase 1-6: completed
+MVP: completed
+big_goal: completed
+latest_pipeline_run: pipeline_20260628_204301
+pipeline_status: passed
+evaluation_id: eval_v001_baseline
+inventory_run_status: available/PASS
+```
+
+后续工作已经从“搭建 MVP 闭环”转为“归档 v001、复核 baseline 结论、增强库存策略回放指标和端到端模型”。
+
 ## 1. 项目目标
 
 FAIA 项目目标是实现一套面向 RDC-FDC 两级仓网的履约优化系统，用于解决两个核心问题：

@@ -1,6 +1,6 @@
 # FAIA v001 Data Validation Report
 
-- generated_at: 2026-06-26T12:41:56
+- generated_at: 2026-06-28T20:59:05
 - overall_status: PASS
 - total_checks: 58
 - failed_checks: 0
@@ -20,8 +20,8 @@
     "orders": 1234855,
     "order_items": 1856325,
     "inventory_snapshot": 4235400,
-    "transfer_plan": 51691,
-    "stockout_events": 2290830
+    "transfer_plan": 51692,
+    "stockout_events": 2293194
   },
   "processed": {
     "fdc_sku_daily_demand": 624438,

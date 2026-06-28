@@ -18,16 +18,16 @@
   "simulation_start_date": "2026-06-03",
   "simulation_end_date": "2026-06-29",
   "total_demand_qty": 298426,
-  "fdc_fulfilled_qty": 994,
-  "rdc_fallback_qty": 13669,
-  "lost_sales_qty": 283763,
-  "fdc_fulfillment_rate": 0.00333081,
-  "loss_ratio": 0.95086554,
+  "fdc_fulfilled_qty": 1000,
+  "rdc_fallback_qty": 13637,
+  "lost_sales_qty": 283789,
+  "fdc_fulfillment_rate": 0.00335091,
+  "loss_ratio": 0.95095266,
   "transfer_cost": 0.0,
-  "rdc_fallback_cost": 16402.8,
-  "lost_sales_cost": 1418815.0,
-  "holding_cost": 8946.78,
-  "total_cost": 1444164.58
+  "rdc_fallback_cost": 16364.4,
+  "lost_sales_cost": 1418945.0,
+  "holding_cost": 8931.66,
+  "total_cost": 1444241.06
 }
 ```
 
@@ -38,7 +38,7 @@
   "daily_state": 635310,
   "transfer_result": 0,
   "fulfillment_result": 99442,
-  "cost_result": 179390
+  "cost_result": 179300
 }
 ```
 
@@ -49,57 +49,57 @@
   "first_days": [
     {
       "simulation_date": "2026-06-03",
-      "arrival_events": 29,
-      "arrival_qty": 57,
+      "arrival_events": 26,
+      "arrival_qty": 55,
       "policy_decisions": 0,
       "recommended_transfer_qty": 0,
       "actual_transfer_qty": 0,
       "demand_cells": 3997,
       "demand_qty": 12054,
-      "fdc_fulfilled_qty": 82,
-      "rdc_fallback_qty": 868,
-      "lost_sales_qty": 11104,
+      "fdc_fulfilled_qty": 84,
+      "rdc_fallback_qty": 861,
+      "lost_sales_qty": 11109,
       "transfer_cost": 0.0,
-      "rdc_fallback_cost": 1041.6,
-      "lost_sales_cost": 55520.0,
-      "holding_cost": 598.77,
-      "total_cost": 57160.37
+      "rdc_fallback_cost": 1033.2,
+      "lost_sales_cost": 55545.0,
+      "holding_cost": 597.39,
+      "total_cost": 57175.59
     },
     {
       "simulation_date": "2026-06-04",
-      "arrival_events": 18,
-      "arrival_qty": 36,
+      "arrival_events": 23,
+      "arrival_qty": 48,
       "policy_decisions": 0,
       "recommended_transfer_qty": 0,
       "actual_transfer_qty": 0,
       "demand_cells": 4114,
       "demand_qty": 12462,
-      "fdc_fulfilled_qty": 82,
+      "fdc_fulfilled_qty": 85,
       "rdc_fallback_qty": 1050,
-      "lost_sales_qty": 11330,
+      "lost_sales_qty": 11327,
       "transfer_cost": 0.0,
       "rdc_fallback_cost": 1260.0,
-      "lost_sales_cost": 56650.0,
-      "holding_cost": 565.89,
-      "total_cost": 58475.89
+      "lost_sales_cost": 56635.0,
+      "holding_cost": 564.78,
+      "total_cost": 58459.78
     },
     {
       "simulation_date": "2026-06-05",
-      "arrival_events": 5,
-      "arrival_qty": 10,
+      "arrival_events": 6,
+      "arrival_qty": 11,
       "policy_decisions": 0,
       "recommended_transfer_qty": 0,
       "actual_transfer_qty": 0,
       "demand_cells": 3790,
       "demand_qty": 11432,
-      "fdc_fulfilled_qty": 70,
-      "rdc_fallback_qty": 886,
-      "lost_sales_qty": 10476,
+      "fdc_fulfilled_qty": 76,
+      "rdc_fallback_qty": 883,
+      "lost_sales_qty": 10473,
       "transfer_cost": 0.0,
-      "rdc_fallback_cost": 1063.2,
-      "lost_sales_cost": 52380.0,
-      "holding_cost": 537.51,
-      "total_cost": 53980.71
+      "rdc_fallback_cost": 1059.6,
+      "lost_sales_cost": 52365.0,
+      "holding_cost": 536.34,
+      "total_cost": 53960.94
     }
   ],
   "last_days": [
@@ -112,14 +112,14 @@
       "actual_transfer_qty": 0,
       "demand_cells": 2917,
       "demand_qty": 8369,
-      "fdc_fulfilled_qty": 18,
+      "fdc_fulfilled_qty": 17,
       "rdc_fallback_qty": 211,
-      "lost_sales_qty": 8140,
+      "lost_sales_qty": 8141,
       "transfer_cost": 0.0,
       "rdc_fallback_cost": 253.2,
-      "lost_sales_cost": 40700.0,
-      "holding_cost": 204.6,
-      "total_cost": 41157.8
+      "lost_sales_cost": 40705.0,
+      "holding_cost": 204.21,
+      "total_cost": 41162.41
     },
     {
       "simulation_date": "2026-06-28",
@@ -130,14 +130,14 @@
       "actual_transfer_qty": 0,
       "demand_cells": 3561,
       "demand_qty": 10645,
-      "fdc_fulfilled_qty": 30,
-      "rdc_fallback_qty": 279,
-      "lost_sales_qty": 10336,
+      "fdc_fulfilled_qty": 28,
+      "rdc_fallback_qty": 280,
+      "lost_sales_qty": 10337,
       "transfer_cost": 0.0,
-      "rdc_fallback_cost": 334.8,
-      "lost_sales_cost": 51680.0,
-      "holding_cost": 195.33,
-      "total_cost": 52210.13
+      "rdc_fallback_cost": 336.0,
+      "lost_sales_cost": 51685.0,
+      "holding_cost": 194.97,
+      "total_cost": 52215.97
     },
     {
       "simulation_date": "2026-06-29",
@@ -154,8 +154,8 @@
       "transfer_cost": 0.0,
       "rdc_fallback_cost": 242.4,
       "lost_sales_cost": 41670.0,
-      "holding_cost": 188.76,
-      "total_cost": 42101.16
+      "holding_cost": 188.4,
+      "total_cost": 42100.8
     }
   ]
 }

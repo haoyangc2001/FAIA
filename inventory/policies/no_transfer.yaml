@@ -1,0 +1,7 @@
+policy_name: no_transfer
+policy_version: inventory_no_transfer_v001
+description: 不生成 RDC -> FDC 调拨建议，用于库存策略下界和链路 smoke test。
+parameters:
+  min_transfer_qty: 1
+  max_transfer_qty_per_sku: 0
+  use_greedy_allocation: false

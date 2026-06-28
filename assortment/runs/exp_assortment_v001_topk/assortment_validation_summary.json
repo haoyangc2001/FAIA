@@ -1,0 +1,65 @@
+{
+  "experiment_id": "exp_assortment_v001_topk",
+  "checked_at": "2026-06-28T20:59:06",
+  "manifest_path": "assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml",
+  "passed": true,
+  "checks": [
+    {
+      "name": "date_window_valid",
+      "passed": true,
+      "detail": "anchor_date, effective_start_date and effective_end_date are ordered"
+    },
+    {
+      "name": "required_files_exist",
+      "passed": true,
+      "detail": "all required assortment files exist",
+      "metrics": {
+        "checked_files": 4,
+        "missing_files": 0
+      }
+    },
+    {
+      "name": "assortment_result_header",
+      "passed": true,
+      "detail": "assortment_result header matches schema",
+      "metrics": {
+        "field_count": 22
+      }
+    },
+    {
+      "name": "row_counts_match_manifest",
+      "passed": true,
+      "detail": "assortment_result row count matches manifest",
+      "metrics": {
+        "expected": 3851,
+        "actual": 3851
+      }
+    },
+    {
+      "name": "assortment_result_rows_valid",
+      "passed": true,
+      "detail": "all assortment_result rows satisfy version, candidate and field constraints",
+      "metrics": {
+        "rows": 3851,
+        "error_count": 0
+      }
+    },
+    {
+      "name": "fdc_group_constraints",
+      "passed": true,
+      "detail": "each FDC has unique SKU rows and continuous rank within K",
+      "metrics": {
+        "fdc_count": 12,
+        "total_selected_rows": 3851,
+        "error_count": 0
+      }
+    }
+  ],
+  "metrics": {
+    "assortment_result_rows": 3851,
+    "row_errors": 0,
+    "fdc_count": 12,
+    "total_selected_rows": 3851,
+    "group_errors": 0
+  }
+}

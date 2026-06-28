@@ -1,6 +1,6 @@
 # Simulation Validation Report: sim_smoke_v001_no_transfer
 
-- checked_at: 2026-06-26T13:40:14
+- checked_at: 2026-06-28T20:59:58
 - result: PASS
 - manifest_path: simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml
 
@@ -40,13 +40,13 @@
     "daily_state": 635310,
     "transfer_result": 0,
     "fulfillment_result": 99442,
-    "cost_result": 179390
+    "cost_result": 179300
   },
   "expected": {
     "daily_state": 635310,
     "transfer_result": 0,
     "fulfillment_result": 99442,
-    "cost_result": 179390
+    "cost_result": 179300
   }
 }
 ```
@@ -73,9 +73,9 @@
   "rows": 99442,
   "error_count": 0,
   "total_demand_qty": 298426,
-  "fdc_fulfilled_qty": 994,
-  "rdc_fallback_qty": 13669,
-  "lost_sales_qty": 283763
+  "fdc_fulfilled_qty": 1000,
+  "rdc_fallback_qty": 13637,
+  "lost_sales_qty": 283789
 }
 ```
 

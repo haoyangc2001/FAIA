@@ -1,0 +1,82 @@
+experiment_id: exp_inventory_v001_base_stock
+data_version: v001
+assortment_version: assortment_hybrid_v001
+inventory_version: inventory_base_stock_v001
+simulation_rule_version: sim_rule_v001
+inventory_root: inventory
+data_root: data
+assortment_root: assortment
+simulation_root: simulation
+decision_date: 2026-06-02
+effective_start_date: 2026-06-03
+effective_end_date: 2026-06-09
+initial_inventory_date: 2026-06-02
+initial_inventory_timing: end_of_day
+inputs:
+  assortment_result: assortment/runs/exp_assortment_v001_topk/assortment_result.csv
+  assortment_manifest: assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml
+  sku_master: data/synthetic/v001/sku_master.csv
+  warehouse_master: data/synthetic/v001/warehouse_master.csv
+  sku_fdc_eligibility: data/synthetic/v001/sku_fdc_eligibility.csv
+  calendar: data/synthetic/v001/calendar.csv
+  promotion_plan: data/synthetic/v001/promotion_plan.csv
+  transfer_plan: data/synthetic/v001/transfer_plan.csv
+  cost_config: data/synthetic/v001/cost_config.csv
+  inventory_daily_state: data/processed/v001/inventory_daily_state.csv
+  fdc_sku_daily_demand: data/processed/v001/fdc_sku_daily_demand.csv
+rules:
+  simulation_rule: simulation/rules/simulation_rule_v001.yaml
+state:
+  state_version: inventory_state_v001
+  source_snapshot_date: 2026-06-02
+  use_assortment_result: true
+  include_rdc_nodes: true
+  include_fdc_nodes: true
+  default_lead_time_days: 2
+forecast:
+  method: historical_mean
+  forecast_version: historical_mean_forecast_v001
+  model_version: none
+  history_window_days: 28
+  horizon_days: 7
+  min_history_days: 1
+  fallback_daily_demand: 0.0
+  promotion_adjustment_enabled: true
+  calendar_adjustment_enabled: true
+tiss:
+  method: rule_tiss
+  tiss_version: rule_tiss_v001
+  service_factor: 1.28
+  replenishment_window_days: 3
+  min_safety_stock_qty: 0
+  mask_unselected_pairs: true
+policy:
+  policy_name: base_stock
+  policy_version: inventory_base_stock_v001
+  model_version: none
+  min_transfer_qty: 1
+  max_transfer_qty_per_sku: 300
+  use_greedy_allocation: true
+allocation:
+  rdc_reserve_rule_version: rdc_reserve_v001
+  rdc_business_reserve_qty_per_sku: 0
+  clip_to_rdc_allocatable_inventory: true
+  clip_to_fdc_capacity: true
+  priority_score:
+    demand_weight: 1.0
+    lost_sales_cost_weight: 1.0
+    promotion_weight: 1.0
+    inventory_position_penalty: 1.0
+simulation:
+  enabled: false
+  rollout_window_days: 7
+  simulation_config_template: simulation/configs/simulation_small.yaml
+output:
+  run_dir: inventory/runs/exp_inventory_v001_base_stock
+  report_dir: inventory/reports
+validation:
+  enforce_schema: true
+  enforce_assortment_mask: true
+  enforce_non_negative_transfer: true
+  enforce_tiss_projection: true
+  enforce_no_future_features: true

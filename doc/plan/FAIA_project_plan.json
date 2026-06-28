@@ -39,8 +39,33 @@
       "能够通过统一指标比较不同选品和库存策略。",
       "能够通过版本字段和 manifest 复现实验。"
     ],
-    "completed": false,
-    "completed_work": []
+    "completed": true,
+    "completed_work": [
+      {
+        "date": "2026-06-28",
+        "summary": "完成 FAIA v001 原型系统真实端到端验收，数据、选品、仿真、库存分配、评估和工程化入口均可从根目录复现。",
+        "outputs": [
+          "artifacts/run_logs/pipeline_20260628_204301_summary.json",
+          "data/versions/v001/manifest.yaml",
+          "assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml",
+          "simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml",
+          "inventory/runs/exp_inventory_v001_base_stock/inventory_manifest.yaml",
+          "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml",
+          "evaluation/reports/eval_v001_baseline_report.md"
+        ],
+        "metrics": {
+          "pipeline_run_id": "pipeline_20260628_204301",
+          "pipeline_status": "passed",
+          "pipeline_steps": 14,
+          "stage_outputs_missing": 0,
+          "data_validation_failed_checks": 0,
+          "inventory_transfer_recommendation_rows": 3829,
+          "evaluation_registry_rows": 4,
+          "evaluation_missing_runs": 0,
+          "evaluation_validation_failed_checks": 0
+        }
+      }
+    ]
   },
   "directory_strategy": {
     "summary": "项目按照阶段建立根目录下的独立模块目录，避免配置、代码、运行结果散落。",
@@ -691,7 +716,7 @@
       "name": "业务仿真环境建设",
       "directory": "simulation/",
       "small_goal": "实现一个可以模拟真实 RDC-FDC 履约过程的业务仿真器，用来评估选品结果和库存策略的实际业务效果。",
-      "completed": false,
+      "completed": true,
       "completed_work": [
         {
           "date": "2026-06-26",
@@ -943,6 +968,29 @@
             "fdc_fulfillment_rate": 0.00333081,
             "loss_ratio": 0.95086554,
             "total_cost": 1444164.58
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "在真实端到端流水线中复验业务仿真阶段，simulation run 与 validation 均通过，输出满足行数、需求守恒、库存守恒和版本 lineage 校验。",
+          "outputs": [
+            "simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml",
+            "simulation/runs/sim_smoke_v001_no_transfer/metrics_summary.json",
+            "simulation/reports/sim_smoke_v001_no_transfer_validation_report.md",
+            "artifacts/run_logs/pipeline_20260628_204301_summary.json"
+          ],
+          "metrics": {
+            "pipeline_run_id": "pipeline_20260628_204301",
+            "run_simulation_status": "passed",
+            "validate_simulation_status": "passed",
+            "daily_state_rows": 635310,
+            "fulfillment_result_rows": 99442,
+            "cost_result_rows": 179300,
+            "total_demand_qty": 298426,
+            "fdc_fulfilled_qty": 1000,
+            "rdc_fallback_qty": 13637,
+            "lost_sales_qty": 283789,
+            "inventory_conservation_errors": 0
           }
         }
       ],
@@ -1436,7 +1484,7 @@
       "name": "前置仓选品系统建设",
       "directory": "assortment/",
       "small_goal": "根据历史订单结构、候选 SKU 池、FDC 容量约束和未来需求信号，为每个 FDC 生成可执行的 SKU assortment。",
-      "completed": false,
+      "completed": true,
       "completed_work": [
         {
           "date": "2026-06-26",
@@ -1550,6 +1598,84 @@
             "reverse_overlap_rows": 3702,
             "avg_topk_overlap_ratio": 0.978447,
             "avg_reverse_overlap_ratio": 0.961309
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "完成 ML-Top-K 第一版线性 baseline，固定 ml_topk_result 输出接口，并为当前 smoke run 生成 ML-Top-K 选品结果。",
+          "outputs": [
+            "assortment/methods/ml_topk.yaml",
+            "assortment/models/ml_topk/README.md",
+            "assortment/src/ml_topk.py",
+            "assortment/runs/exp_assortment_v001_topk/ml_topk_result.csv",
+            "assortment/runs/exp_assortment_v001_topk/ml_topk_model_manifest.yaml"
+          ],
+          "metrics": {
+            "ml_topk_result_rows": 3851,
+            "fdc_count": 12,
+            "model_version": "ml_topk_linear_v001",
+            "feature_rows_matched": 0,
+            "scored_candidate_rows": 24963
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "完成选品评估器，实现 regular order 过滤、订单完整覆盖率、SKU 频次召回、NDCG、候选池命中率和分层覆盖率计算，并补充独立评估入口与单元测试。",
+          "outputs": [
+            "assortment/src/evaluation.py",
+            "assortment/scripts/evaluate_assortment.py",
+            "assortment/tests/test_ml_topk_and_evaluation.py"
+          ],
+          "metrics": {
+            "supported_methods": [
+              "topk",
+              "reverse_exclude",
+              "hybrid",
+              "ml_topk"
+            ],
+            "supported_metrics": [
+              "local_order_fulfillment_rate",
+              "sku_frequency_recall_at_k",
+              "ndcg_at_k",
+              "candidate_hit_rate",
+              "coverage_by_order_size",
+              "coverage_by_category"
+            ],
+            "unit_tests": "PASS",
+            "full_v001_evaluation_note": "当前 checkout 中 orders/order_items/sku_master 为 Git LFS pointer，需 materialized CSV 后重算全量 assortment_metrics.json。"
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "完成选品结果发布与版本管理，将当前 Hybrid 结果发布为稳定 assortment_result.csv，并生成可复现的 assortment_manifest.yaml。",
+          "outputs": [
+            "assortment/src/publish.py",
+            "assortment/runs/exp_assortment_v001_topk/assortment_result.csv",
+            "assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml"
+          ],
+          "metrics": {
+            "published_method": "hybrid",
+            "assortment_result_rows": 3851,
+            "assortment_version": "assortment_hybrid_v001"
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "完成选品运行校验与单元测试，覆盖 schema、manifest 行数、候选合法性、source_tag、selected_k、rank 连续性和 SKU 去重等约束。",
+          "outputs": [
+            "assortment/src/validation.py",
+            "assortment/scripts/validate_assortment_run.py",
+            "assortment/runs/exp_assortment_v001_topk/assortment_validation_summary.json",
+            "assortment/reports/exp_assortment_v001_topk_assortment_validation_report.md",
+            "assortment/tests/test_ml_topk_and_evaluation.py"
+          ],
+          "metrics": {
+            "validation_status": "PASS",
+            "assortment_result_rows": 3851,
+            "fdc_count": 12,
+            "row_errors": 0,
+            "group_errors": 0,
+            "unit_tests": "PASS"
           }
         }
       ],
@@ -1788,8 +1914,27 @@
             "assortment/models/ml_topk/",
             "ml_topk_result.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "完成 ML-Top-K 第一版线性 baseline，使用历史订单频次、未来计划促销/活动和静态热度生成 ml_score，并按 FDC 内 K 值输出 ml_topk_result.csv。",
+              "outputs": [
+                "assortment/methods/ml_topk.yaml",
+                "assortment/models/ml_topk/README.md",
+                "assortment/src/ml_topk.py",
+                "assortment/runs/exp_assortment_v001_topk/ml_topk_result.csv",
+                "assortment/runs/exp_assortment_v001_topk/ml_topk_model_manifest.yaml"
+              ],
+              "metrics": {
+                "ml_topk_result_rows": 3851,
+                "fdc_count": 12,
+                "model_version": "ml_topk_linear_v001",
+                "feature_rows_matched": 0,
+                "scored_candidate_rows": 24963
+              }
+            }
+          ]
         },
         {
           "item_id": "3.10",
@@ -1799,8 +1944,22 @@
             "assortment_metrics.json",
             "assortment_report.md"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "完成选品评估器，支持对 Top-K、Reverse-Exclude、Hybrid 和 ML-Top-K 计算订单结构覆盖率、未来 SKU 频次召回、NDCG、候选池命中率和分层覆盖率。",
+              "outputs": [
+                "assortment/src/evaluation.py",
+                "assortment/scripts/evaluate_assortment.py",
+                "assortment/tests/test_ml_topk_and_evaluation.py"
+              ],
+              "metrics": {
+                "unit_tests": "PASS",
+                "full_v001_evaluation_note": "当前 checkout 中 orders/order_items/sku_master 为 Git LFS pointer，需 materialized CSV 后重算全量 assortment_metrics.json 和 assortment_report.md。"
+              }
+            }
+          ]
         },
         {
           "item_id": "3.11",
@@ -1809,8 +1968,27 @@
           "deliverables": [
             "assortment_manifest.yaml"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现选品结果发布器，按配置从 topk、reverse_exclude、hybrid 或 ml_topk 方法结果中选择发布源，输出标准 assortment_result.csv 与 assortment_manifest.yaml。",
+              "outputs": [
+                "assortment/src/publish.py",
+                "assortment/scripts/run_assortment.py",
+                "assortment/configs/assortment_small.yaml",
+                "assortment/runs/exp_assortment_v001_topk/assortment_result.csv",
+                "assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml"
+              ],
+              "metrics": {
+                "published_method": "hybrid",
+                "published_method_version": "hybrid_v001",
+                "assortment_version": "assortment_hybrid_v001",
+                "assortment_result_rows": 3851,
+                "fdc_count": 12
+              }
+            }
+          ]
         },
         {
           "item_id": "3.12",
@@ -1819,8 +1997,29 @@
           "deliverables": [
             "assortment/tests/"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现运行级选品校验器和 CLI，校验 assortment_result 与 assortment_manifest 的 schema、行数、版本、候选池合法性、source_tag、K 表一致性、rank 连续性和 SKU 去重，并补充单元测试。",
+              "outputs": [
+                "assortment/src/validation.py",
+                "assortment/scripts/validate_assortment_run.py",
+                "assortment/runs/exp_assortment_v001_topk/assortment_validation_summary.json",
+                "assortment/reports/exp_assortment_v001_topk_assortment_validation_report.md",
+                "assortment/tests/test_ml_topk_and_evaluation.py"
+              ],
+              "metrics": {
+                "validation_status": "PASS",
+                "assortment_result_rows": 3851,
+                "fdc_count": 12,
+                "total_selected_rows": 3851,
+                "row_errors": 0,
+                "group_errors": 0,
+                "unit_tests": "PASS"
+              }
+            }
+          ]
         }
       ],
       "completion_criteria": [
@@ -1840,8 +2039,94 @@
       "name": "库存分配系统建设",
       "directory": "inventory/",
       "small_goal": "基于前置仓选品结果、当前库存、在途库存、需求预测、lead time、成本参数和业务约束，生成每日 RDC -> FDC 的库存分配建议。",
-      "completed": false,
-      "completed_work": [],
+      "completed": true,
+      "completed_work": [
+        {
+          "date": "2026-06-28",
+          "summary": "完成库存分配系统基础边界、目录骨架、运行配置和第一版输入输出 schema，为后续库存状态构建、预测、SS/TI 和调拨策略实现打好契约基础。",
+          "outputs": [
+            "inventory/README.md",
+            "inventory/configs/inventory_small.yaml",
+            "inventory/configs/inventory_default.yaml",
+            "inventory/schemas/inventory_state.schema.yaml",
+            "inventory/schemas/demand_forecast.schema.yaml",
+            "inventory/schemas/tiss_result.schema.yaml",
+            "inventory/schemas/transfer_recommendation.schema.yaml"
+          ],
+          "metrics": {
+            "completed_items": [
+              "4.1",
+              "4.2",
+              "4.3"
+            ],
+            "schema_count": 4,
+            "config_count": 2
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "完成库存分配规则 baseline 链路，覆盖库存状态样本构建、历史均值预测、规则 SS/TI、base-stock 调拨建议、RDC 自留库存和 greedy allocation。",
+          "outputs": [
+            "inventory/src/common.py",
+            "inventory/src/state_builder.py",
+            "inventory/src/forecasting.py",
+            "inventory/src/tiss.py",
+            "inventory/src/policies.py",
+            "inventory/src/allocator.py",
+            "inventory/scripts/run_inventory_baseline.py",
+            "inventory/policies/no_transfer.yaml",
+            "inventory/policies/historical_mean.yaml",
+            "inventory/policies/base_stock.yaml",
+            "inventory/policies/greedy_allocation.yaml",
+            "inventory/policies/parameter_search.yaml",
+            "inventory/tests/test_inventory_baseline.py"
+          ],
+          "metrics": {
+            "completed_items": [
+              "4.4",
+              "4.5",
+              "4.6",
+              "4.7",
+              "4.8"
+            ],
+            "unit_tests": "PASS",
+            "inventory_unit_tests": 5,
+            "simulation_unit_tests": 8,
+            "assortment_unit_tests": 4,
+            "full_v001_run_note": "当前 checkout 中 data/synthetic 与 data/processed 多个 CSV 为 Git LFS pointer，需 materialized CSV 后运行完整 inventory_small/default。"
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "完成库存分配 simulation 接入、端到端接口预留、manifest/version 管理、运行校验、报告和单元测试，形成库存策略输出 -> simulation 回放 -> 指标/校验/报告的闭环。",
+          "outputs": [
+            "inventory/src/evaluator.py",
+            "inventory/src/manifest.py",
+            "inventory/src/interfaces.py",
+            "inventory/src/loss.py",
+            "inventory/src/validation.py",
+            "inventory/scripts/evaluate_inventory.py",
+            "inventory/scripts/validate_inventory_run.py",
+            "inventory/scripts/run_inventory_baseline.py",
+            "inventory/tests/test_inventory_baseline.py",
+            "inventory/README.md"
+          ],
+          "metrics": {
+            "completed_items": [
+              "4.9",
+              "4.10",
+              "4.11",
+              "4.12"
+            ],
+            "unit_tests": "PASS",
+            "inventory_unit_tests": 5,
+            "simulation_unit_tests": 8,
+            "assortment_unit_tests": 4,
+            "toy_simulation_manifest_validation": "PASS",
+            "full_v001_run_note": "当前 checkout 中 data/synthetic 与 data/processed 多个 CSV 为 Git LFS pointer，完整 inventory_small/default 需 materialized CSV 后运行。"
+          }
+        }
+      ],
       "work_items": [
         {
           "item_id": "4.1",
@@ -1850,8 +2135,16 @@
           "deliverables": [
             "inventory/README.md 中的定位说明"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "编写 inventory/README.md，明确库存分配系统解决“放多少”、消费 assortment_result、依赖 simulation 评估，并约束不负责选品、需求改写和绕过业务硬约束。",
+              "outputs": [
+                "inventory/README.md"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.2",
@@ -1860,8 +2153,25 @@
           "deliverables": [
             "inventory/"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "建立 inventory/ 目录骨架，包含 configs、schemas、policies、models、src、scripts、tests、runs、reports，并预留 forecasting 与 tiss 模型目录。",
+              "outputs": [
+                "inventory/configs/",
+                "inventory/schemas/",
+                "inventory/policies/",
+                "inventory/models/forecasting/",
+                "inventory/models/tiss/",
+                "inventory/src/",
+                "inventory/scripts/",
+                "inventory/tests/",
+                "inventory/runs/",
+                "inventory/reports/"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.3",
@@ -1873,8 +2183,21 @@
             "tiss_result.schema.yaml",
             "transfer_recommendation.schema.yaml"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "定义库存分配第一版输入输出契约，固定 inventory_state、demand_forecast、tiss_result、transfer_recommendation 的版本字段、主键、核心字段和业务约束，并补充 small/default 两套运行配置。",
+              "outputs": [
+                "inventory/schemas/inventory_state.schema.yaml",
+                "inventory/schemas/demand_forecast.schema.yaml",
+                "inventory/schemas/tiss_result.schema.yaml",
+                "inventory/schemas/transfer_recommendation.schema.yaml",
+                "inventory/configs/inventory_small.yaml",
+                "inventory/configs/inventory_default.yaml"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.4",
@@ -1883,8 +2206,17 @@
           "deliverables": [
             "inventory_state.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现库存状态构建模块，读取 assortment_result、warehouse_master、sku_fdc_eligibility、inventory_daily_state 和 transfer_plan，生成 RDC/FDC on-hand、pipeline、assortment_mask、eligible_mask、lead_time 和 capacity_state。",
+              "outputs": [
+                "inventory/src/state_builder.py",
+                "inventory/scripts/run_inventory_baseline.py"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.5",
@@ -1893,8 +2225,16 @@
           "deliverables": [
             "demand_forecast.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现 HistoricalMeanForecast baseline，按 decision_date 之前历史窗口生成未来需求预测，并支持未来已知 calendar 与 promotion 修正和 RDC 聚合预测。",
+              "outputs": [
+                "inventory/src/forecasting.py"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.6",
@@ -1903,8 +2243,16 @@
           "deliverables": [
             "tiss_result.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现 RuleTISS，基于需求预测、lead time、历史需求波动和 service_factor 生成 safety_stock 与 target_inventory，并对未选品或不可履约 FDC-SKU 做零库存投影。",
+              "outputs": [
+                "inventory/src/tiss.py"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.7",
@@ -1913,8 +2261,21 @@
           "deliverables": [
             "transfer_recommendation.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现库存 baseline 策略入口，支持 no_transfer、historical_mean、base_stock、greedy_allocation 和 parameter_search 预留配置，输出统一 transfer_recommendation 字段。",
+              "outputs": [
+                "inventory/src/policies.py",
+                "inventory/policies/no_transfer.yaml",
+                "inventory/policies/historical_mean.yaml",
+                "inventory/policies/base_stock.yaml",
+                "inventory/policies/greedy_allocation.yaml",
+                "inventory/policies/parameter_search.yaml"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.8",
@@ -1924,8 +2285,17 @@
             "RDC reserve rule",
             "priority allocation rule"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现 RDC 自留库存和 greedy allocation。RDC 可调拨库存按 max(RDC SS, business reserve) 预留后计算；库存不足时按 forecast_demand、lost_sales_cost 和 inventory_position 生成 priority_score 并分配实际调拨量。",
+              "outputs": [
+                "inventory/src/allocator.py",
+                "inventory/tests/test_inventory_baseline.py"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.9",
@@ -1935,8 +2305,17 @@
             "simulation_metrics.json",
             "inventory_report.md"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现库存策略 simulation 回放 evaluator，读取 transfer_recommendation 后复用 simulation 的状态、调拨裁剪、履约、成本和指标逻辑，输出 simulation_metrics、daily_state、transfer_result、fulfillment_result、cost_result 和 daily_log。",
+              "outputs": [
+                "inventory/src/evaluator.py",
+                "inventory/scripts/evaluate_inventory.py"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.10",
@@ -1945,8 +2324,17 @@
           "deliverables": [
             "end_to_end interface design"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "预留端到端库存分配接口，固定 ForecastingModule、TISSGenerationModule、SimulationModule、LossComputer 和 InventoryBatch 边界，并提供第一版 operational loss helper。",
+              "outputs": [
+                "inventory/src/interfaces.py",
+                "inventory/src/loss.py"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.11",
@@ -1955,8 +2343,17 @@
           "deliverables": [
             "inventory_manifest.yaml"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现 inventory_manifest 和 inventory_version 管理，记录输入版本、策略版本、模型版本、输出行数、simulation 指标、版本血缘和 replay command，并在 baseline 入口中自动写出。",
+              "outputs": [
+                "inventory/src/manifest.py",
+                "inventory/scripts/run_inventory_baseline.py"
+              ]
+            }
+          ]
         },
         {
           "item_id": "4.12",
@@ -1965,8 +2362,22 @@
           "deliverables": [
             "inventory/tests/"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现库存运行校验与单元测试，覆盖输出存在性、manifest 行数、版本血缘、库存非负、预测无泄漏、TI >= SS、mask 约束、调拨非负、RDC 可调拨库存和 simulation metrics 守恒。",
+              "outputs": [
+                "inventory/src/validation.py",
+                "inventory/scripts/validate_inventory_run.py",
+                "inventory/tests/test_inventory_baseline.py"
+              ],
+              "metrics": {
+                "inventory_unit_tests": 5,
+                "validation_status": "PASS"
+              }
+            }
+          ]
         }
       ],
       "completion_criteria": [
@@ -1987,8 +2398,77 @@
       "name": "评估与实验系统建设",
       "directory": "evaluation/",
       "small_goal": "建立统一实验框架，稳定比较不同阶段、不同算法、不同策略的效果。",
-      "completed": false,
-      "completed_work": [],
+      "completed": true,
+      "completed_work": [
+        {
+          "date": "2026-06-28",
+          "summary": "完成评估系统 5.1-5.3：建立 evaluation 目录骨架，明确统一裁判定位与边界，定义 evaluation_default 配置、evaluation_manifest 初始协议和 experiment_registry/evaluation_manifest schema。",
+          "outputs": [
+            "evaluation/README.md",
+            "evaluation/configs/evaluation_default.yaml",
+            "evaluation/schemas/evaluation_manifest.schema.yaml",
+            "evaluation/schemas/experiment_registry.schema.yaml",
+            "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml"
+          ],
+          "metrics": {
+            "evaluation_id": "eval_v001_baseline",
+            "evaluation_version": "evaluation_protocol_v001",
+            "status": "protocol_defined"
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "完成评估系统 5.4-5.6：定义统一 metrics_summary 长表契约，建立 baseline comparison_table，对 data、assortment、simulation、inventory manifest 做实验注册与指标归一收集。",
+          "outputs": [
+            "evaluation/schemas/metrics_summary.schema.yaml",
+            "evaluation/schemas/comparison_table.schema.yaml",
+            "evaluation/src/common.py",
+            "evaluation/src/metrics.py",
+            "evaluation/src/compare.py",
+            "evaluation/src/collect.py",
+            "evaluation/scripts/collect_results.py",
+            "evaluation/runs/eval_v001_baseline/experiment_registry.csv",
+            "evaluation/runs/eval_v001_baseline/metrics_summary.csv",
+            "evaluation/runs/eval_v001_baseline/comparison_table.csv",
+            "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml",
+            "evaluation/tests/test_collect_results.py"
+          ],
+          "metrics": {
+            "evaluation_id": "eval_v001_baseline",
+            "experiment_registry_rows": 4,
+            "metrics_summary_rows": 62,
+            "comparison_table_rows": 14,
+            "available_runs": 3,
+            "missing_runs": 1,
+            "unit_tests": "PASS"
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "完成评估系统 5.7-5.8：生成综合评估报告，实现 evaluation 运行校验，覆盖文件存在性、row_counts、版本/窗口一致性、指标完整性、取值范围、需求/成本守恒和缺失实验显式登记。",
+          "outputs": [
+            "evaluation/src/report.py",
+            "evaluation/src/validation.py",
+            "evaluation/scripts/build_report.py",
+            "evaluation/scripts/validate_evaluation_run.py",
+            "evaluation/reports/eval_v001_baseline_report.md",
+            "evaluation/runs/eval_v001_baseline/evaluation_validation_summary.json",
+            "evaluation/reports/eval_v001_baseline_validation_report.md",
+            "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml",
+            "evaluation/tests/test_collect_results.py"
+          ],
+          "metrics": {
+            "evaluation_id": "eval_v001_baseline",
+            "validation_status": "PASS",
+            "validation_failed_checks": 0,
+            "registry_rows": 4,
+            "metrics_summary_rows": 62,
+            "comparison_table_rows": 14,
+            "unit_tests": "PASS",
+            "note": "当前 inventory run 在 registry 中显式登记为 missing，等待 inventory_manifest 产出后可重新 collect/report/validate。"
+          }
+        }
+      ],
       "work_items": [
         {
           "item_id": "5.1",
@@ -1997,8 +2477,16 @@
           "deliverables": [
             "evaluation/README.md 中的定位说明"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "在 evaluation/README.md 中明确评估系统作为统一裁判台的定位、负责范围和不负责范围，约束其只能读取各阶段 manifest、metrics 和 validation summary 做同口径比较。",
+              "outputs": [
+                "evaluation/README.md"
+              ]
+            }
+          ]
         },
         {
           "item_id": "5.2",
@@ -2007,8 +2495,22 @@
           "deliverables": [
             "evaluation/"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "创建 evaluation 轻量目录骨架，预留 configs、schemas、src、scripts、tests、runs 和 reports，并保留 eval_v001_baseline 初始运行目录。",
+              "outputs": [
+                "evaluation/configs/",
+                "evaluation/schemas/",
+                "evaluation/src/",
+                "evaluation/scripts/",
+                "evaluation/tests/",
+                "evaluation/runs/eval_v001_baseline/",
+                "evaluation/reports/"
+              ]
+            }
+          ]
         },
         {
           "item_id": "5.3",
@@ -2018,8 +2520,25 @@
             "evaluation_default.yaml",
             "evaluation_manifest.yaml"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "定义 eval_v001_baseline 第一版统一实验协议，固定 data_version、split_version、evaluation_window、assortment_version、inventory_version、simulation_rule_version 和 cost_config_version，并声明上游 manifest 来源与预期输出。",
+              "outputs": [
+                "evaluation/configs/evaluation_default.yaml",
+                "evaluation/schemas/evaluation_manifest.schema.yaml",
+                "evaluation/schemas/experiment_registry.schema.yaml",
+                "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml"
+              ],
+              "metrics": {
+                "data_version": "v001",
+                "split_version": "split_v001",
+                "evaluation_split": "test",
+                "evaluation_window": "2026-06-03 to 2026-06-29"
+              }
+            }
+          ]
         },
         {
           "item_id": "5.4",
@@ -2028,8 +2547,18 @@
           "deliverables": [
             "metrics_summary.schema.yaml"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "定义统一指标长表 schema，以 stage、experiment、method、metric_level、metric_key、metric_name 和 metric_value 表达数据层、选品层、仿真层和库存层指标，并补充 comparison_table schema。",
+              "outputs": [
+                "evaluation/schemas/metrics_summary.schema.yaml",
+                "evaluation/schemas/comparison_table.schema.yaml",
+                "evaluation/src/metrics.py"
+              ]
+            }
+          ]
         },
         {
           "item_id": "5.5",
@@ -2038,8 +2567,23 @@
           "deliverables": [
             "comparison_table.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现 baseline 对比矩阵生成逻辑，按配置输出选品方法、库存方法和组合实验的 comparison_table.csv，并将 simulation no_transfer 指标作为 NoTransfer baseline 指标来源。",
+              "outputs": [
+                "evaluation/src/compare.py",
+                "evaluation/runs/eval_v001_baseline/comparison_table.csv"
+              ],
+              "metrics": {
+                "comparison_table_rows": 14,
+                "assortment_methods": 4,
+                "inventory_methods": 5,
+                "combination_experiments": 5
+              }
+            }
+          ]
         },
         {
           "item_id": "5.6",
@@ -2049,8 +2593,34 @@
             "experiment_registry.csv",
             "metrics_summary.csv"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现 collect_results CLI，扫描 data、assortment、simulation、inventory manifest，生成 experiment_registry.csv、metrics_summary.csv 和收集后的 evaluation_manifest.yaml；缺失 inventory run 会显式登记为 missing。",
+              "outputs": [
+                "evaluation/src/common.py",
+                "evaluation/src/collect.py",
+                "evaluation/scripts/collect_results.py",
+                "evaluation/runs/eval_v001_baseline/experiment_registry.csv",
+                "evaluation/runs/eval_v001_baseline/metrics_summary.csv",
+                "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml",
+                "evaluation/tests/test_collect_results.py"
+              ],
+              "metrics": {
+                "experiment_registry_rows": 4,
+                "metrics_summary_rows": 62,
+                "available_runs": 3,
+                "missing_runs": 1,
+                "metric_rows_by_stage": {
+                  "data": 14,
+                  "assortment": 33,
+                  "simulation": 15
+                },
+                "unit_tests": "PASS"
+              }
+            }
+          ]
         },
         {
           "item_id": "5.7",
@@ -2059,8 +2629,24 @@
           "deliverables": [
             "evaluation_report.md"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现 evaluation report 生成器和 CLI，读取 experiment_registry、metrics_summary 和 comparison_table，输出包含实验目标、版本协议、主指标对比、trade-off、异常分析和结论的 Markdown 报告。",
+              "outputs": [
+                "evaluation/src/report.py",
+                "evaluation/scripts/build_report.py",
+                "evaluation/reports/eval_v001_baseline_report.md"
+              ],
+              "metrics": {
+                "report_path": "evaluation/reports/eval_v001_baseline_report.md",
+                "registry_rows": 4,
+                "metrics_summary_rows": 62,
+                "comparison_table_rows": 14
+              }
+            }
+          ]
         },
         {
           "item_id": "5.8",
@@ -2069,8 +2655,26 @@
           "deliverables": [
             "evaluation validation report"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "实现 evaluation 运行校验器和 CLI，校验必需文件、manifest row_counts、版本协议、评估窗口、核心指标完整性、取值范围、需求守恒、成本守恒和缺失实验显式登记，并回写 validation 到 evaluation_manifest。",
+              "outputs": [
+                "evaluation/src/validation.py",
+                "evaluation/scripts/validate_evaluation_run.py",
+                "evaluation/runs/eval_v001_baseline/evaluation_validation_summary.json",
+                "evaluation/reports/eval_v001_baseline_validation_report.md",
+                "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml",
+                "evaluation/tests/test_collect_results.py"
+              ],
+              "metrics": {
+                "validation_status": "PASS",
+                "failed_checks": 0,
+                "unit_tests": "PASS"
+              }
+            }
+          ]
         }
       ],
       "completion_criteria": [
@@ -2089,8 +2693,42 @@
       "name": "工程化与版本管理",
       "directory": "project_root",
       "small_goal": "把前五个阶段统一成稳定工程体系，让项目可运行、可复现、可扩展。",
-      "completed": false,
-      "completed_work": [],
+      "completed": true,
+      "completed_work": [
+        {
+          "date": "2026-06-28",
+          "summary": "完成 Phase 6 第一批工程化入口建设，新增根层 README、pyproject.toml、configs/project.yaml、Makefile 和 scripts/run_full_pipeline.py，将 data、assortment、simulation、inventory、evaluation 五个阶段统一到根目录可发现、可 dry-run、可分阶段执行的工程入口下。",
+          "outputs": [
+            "README.md",
+            "pyproject.toml",
+            "configs/project.yaml",
+            "Makefile",
+            "scripts/run_full_pipeline.py"
+          ],
+          "metrics": {
+            "pipeline_stages": 5,
+            "make_targets": 13,
+            "dry_run_supported": true
+          }
+        },
+        {
+          "date": "2026-06-28",
+          "summary": "完成 Phase 6 第二批工程化收口，新增 manifest 标准、日志与异常处理约定，建设根层 integration tests 并接入 make test，用轻量契约测试覆盖项目配置、runner dry-run 日志、manifest 版本血缘和缺失 inventory run 显式登记。",
+          "outputs": [
+            "doc/engineering/manifest_standards.md",
+            "doc/engineering/logging_and_error_handling.md",
+            "tests/integration/test_project_contracts.py",
+            "tests/integration/__init__.py",
+            "Makefile",
+            "configs/project.yaml"
+          ],
+          "metrics": {
+            "integration_tests": 7,
+            "make_test_status": "PASS",
+            "phase_completed": true
+          }
+        }
+      ],
       "work_items": [
         {
           "item_id": "6.1",
@@ -2102,8 +2740,19 @@
             "Makefile",
             "configs/project.yaml"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "重写根 README，补齐 pyproject.toml、Makefile 和 configs/project.yaml，明确项目根目录结构、阶段职责、快速开始、数据 LFS 注意事项、主要产物和文档入口。",
+              "outputs": [
+                "README.md",
+                "pyproject.toml",
+                "Makefile",
+                "configs/project.yaml"
+              ]
+            }
+          ]
         },
         {
           "item_id": "6.2",
@@ -2112,8 +2761,20 @@
           "deliverables": [
             "configs/project.yaml"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "新增全局工程配置 configs/project.yaml，集中声明默认版本字段、阶段配置路径、manifest 路径、报告路径、LFS 数据策略、执行环境和五阶段 pipeline 命令编排，为后续去硬编码和版本体系收敛建立根层口径。",
+              "outputs": [
+                "configs/project.yaml"
+              ],
+              "metrics": {
+                "configured_stages": 5,
+                "stage_commands": 14
+              }
+            }
+          ]
         },
         {
           "item_id": "6.3",
@@ -2123,8 +2784,22 @@
             "Makefile",
             "scripts/run_full_pipeline.py"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "新增根层 Makefile 和 scripts/run_full_pipeline.py，提供 make data、make simulation、make assortment、make inventory、make evaluation、make full、make test、make dry-run 等统一入口，并为 pipeline 执行写入 artifacts/run_logs 下的 JSONL 日志和 summary。",
+              "outputs": [
+                "Makefile",
+                "scripts/run_full_pipeline.py"
+              ],
+              "metrics": {
+                "make_targets": 13,
+                "runner_stage_count": 5,
+                "runner_supports_dry_run": true
+              }
+            }
+          ]
         },
         {
           "item_id": "6.4",
@@ -2133,8 +2808,21 @@
           "deliverables": [
             "manifest standards"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "新增 doc/engineering/manifest_standards.md，统一 manifest 必备字段、版本字段、状态值、阶段稳定输出和 evaluation 可比性规则，并记录 no-transfer simulation 历史 assortment_version 与已发布 assortment_hybrid_v001 的兼容说明。",
+              "outputs": [
+                "doc/engineering/manifest_standards.md",
+                "configs/project.yaml"
+              ],
+              "metrics": {
+                "version_fields_documented": 14,
+                "stable_stage_outputs_documented": 5
+              }
+            }
+          ]
         },
         {
           "item_id": "6.5",
@@ -2144,8 +2832,23 @@
             "logging convention",
             "error handling convention"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "新增 doc/engineering/logging_and_error_handling.md，固定 artifacts/run_logs 下 JSONL 事件日志和 summary JSON 的协议，说明 run_start、step_start、step_finish、run_finish 事件、fail-fast 行为、stdout/stderr tail、报告目录和缺失产物显式登记规则。",
+              "outputs": [
+                "doc/engineering/logging_and_error_handling.md",
+                "configs/project.yaml",
+                "scripts/run_full_pipeline.py"
+              ],
+              "metrics": {
+                "log_format": "jsonl",
+                "summary_format": "json",
+                "failure_behavior": "fail_fast"
+              }
+            }
+          ]
         },
         {
           "item_id": "6.6",
@@ -2154,8 +2857,23 @@
           "deliverables": [
             "tests/integration/"
           ],
-          "completed": false,
-          "completed_work": []
+          "completed": true,
+          "completed_work": [
+            {
+              "date": "2026-06-28",
+              "summary": "新增根层 integration tests 并接入 Makefile，覆盖 project.yaml 阶段命令展开、工程文档存在性、manifest 版本血缘、evaluation 对缺失 inventory run 的显式登记、runner dry-run 日志协议和 Makefile 测试入口。",
+              "outputs": [
+                "tests/integration/__init__.py",
+                "tests/integration/test_project_contracts.py",
+                "Makefile"
+              ],
+              "metrics": {
+                "integration_tests": 7,
+                "module_tests": 18,
+                "make_test_status": "PASS"
+              }
+            }
+          ]
         }
       ],
       "completion_criteria": [
@@ -2209,38 +2927,48 @@
       "baseline 能比较。",
       "报告能解释。"
     ],
-    "completed": false,
-    "completed_work": []
+    "completed": true,
+    "completed_work": [
+      {
+        "date": "2026-06-28",
+        "summary": "完成 MVP 闭环验收：真实 synthetic/processed 数据已重建，full pipeline 从 data 到 evaluation 全部通过，inventory 运行已从 missing 变为 available。",
+        "outputs": [
+          "artifacts/run_logs/pipeline_20260628_204301_summary.json",
+          "inventory/runs/exp_inventory_v001_base_stock/inventory_manifest.yaml",
+          "inventory/runs/exp_inventory_v001_base_stock/transfer_recommendation.csv",
+          "evaluation/runs/eval_v001_baseline/experiment_registry.csv",
+          "evaluation/runs/eval_v001_baseline/metrics_summary.csv",
+          "evaluation/runs/eval_v001_baseline/comparison_table.csv",
+          "evaluation/runs/eval_v001_baseline/evaluation_validation_summary.json"
+        ],
+        "metrics": {
+          "pipeline_status": "passed",
+          "data_validation_total_checks": 58,
+          "data_validation_failed_checks": 0,
+          "inventory_run_status": "available",
+          "inventory_transfer_recommendation_rows": 3829,
+          "evaluation_available_runs": 4,
+          "evaluation_missing_runs": 0,
+          "evaluation_metrics_rows": 638,
+          "evaluation_comparison_rows": 14,
+          "evaluation_validation_passed": true
+        }
+      }
+    ]
   },
   "current_priority": [
     {
       "priority": 1,
-      "description": "构建可控、可复现的虚拟业务数据世界。"
+      "description": "归档并提交已通过端到端验收的 FAIA v001 原型、配置、manifest、报告和测试。"
     },
     {
       "priority": 2,
-      "description": "构建能够回放库存、调拨、履约和缺货的仿真闭环。"
+      "description": "复核评估报告中的业务指标，沉淀 v001 baseline 结论和下一轮实验假设。"
     },
     {
       "priority": 3,
-      "description": "跑通 Top-K / Reverse-Exclude / Hybrid 选品闭环。"
-    },
-    {
-      "priority": 4,
-      "description": "跑通 BaseStock 库存分配闭环。"
-    },
-    {
-      "priority": 5,
-      "description": "建立 evaluation 统一比较口径。"
-    },
-    {
-      "priority": 6,
-      "description": "实现 ML-Top-K。"
-    },
-    {
-      "priority": 7,
-      "description": "实现端到端库存分配模型。"
+      "description": "继续推进增强任务：库存策略接入仿真回放指标、端到端库存分配模型、Forecasting/TISS 模块升级。"
     }
   ],
-  "last_updated": "2026-06-26"
+  "last_updated": "2026-06-28"
 }

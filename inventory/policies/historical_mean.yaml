@@ -1,0 +1,8 @@
+policy_name: historical_mean
+policy_version: inventory_historical_mean_v001
+description: 基于历史均值覆盖天数生成补货建议。
+parameters:
+  cover_days: 3
+  min_transfer_qty: 1
+  max_transfer_qty_per_sku: 300
+  use_greedy_allocation: true

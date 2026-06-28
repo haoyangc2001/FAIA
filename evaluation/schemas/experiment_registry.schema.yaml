@@ -1,0 +1,124 @@
+version: v001
+table: experiment_registry
+description: 综合评估实验注册表契约，每行登记一个上游阶段 manifest 或一个显式声明但尚未产出的实验。
+primary_key:
+  - evaluation_id
+  - stage
+  - experiment_id
+fields:
+  - name: evaluation_id
+    type: string
+    nullable: false
+    description: 综合评估 ID。
+  - name: stage
+    type: string
+    nullable: false
+    allowed_values: [data, assortment, simulation, inventory]
+    description: 上游阶段。
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 上游实验 ID；data 阶段可使用 data_version。
+  - name: run_status
+    type: string
+    nullable: false
+    allowed_values: [available, missing, not_run, invalid, skipped]
+    description: 上游实验产物状态。
+  - name: method_name
+    type: string
+    nullable: true
+    description: 方法名称，例如 hybrid、base_stock、no_transfer。
+  - name: method_family
+    type: string
+    nullable: true
+    allowed_values: [baseline, heuristic, ml_model, e2e_model, data_artifact, unknown]
+    description: 方法族，用于 baseline matrix 和报告分组。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 数据版本。
+  - name: split_version
+    type: string
+    nullable: true
+    description: 时间切分版本。
+  - name: feature_version
+    type: string
+    nullable: true
+    description: 特征版本。
+  - name: candidate_pool_version
+    type: string
+    nullable: true
+    description: 候选池版本。
+  - name: k_rule_version
+    type: string
+    nullable: true
+    description: K 规则版本。
+  - name: assortment_version
+    type: string
+    nullable: true
+    description: 选品版本。
+  - name: inventory_version
+    type: string
+    nullable: true
+    description: 库存策略版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: true
+    description: 仿真规则版本。
+  - name: cost_config_version
+    type: string
+    nullable: true
+    description: 成本配置版本。
+  - name: policy_version
+    type: string
+    nullable: true
+    description: 策略版本。
+  - name: model_version
+    type: string
+    nullable: true
+    description: 模型版本。
+  - name: evaluation_split
+    type: string
+    nullable: false
+    allowed_values: [train, validation, test]
+    description: 本次评价使用的数据切分。
+  - name: evaluation_start_date
+    type: date
+    nullable: false
+    description: 评估窗口开始日期。
+  - name: evaluation_end_date
+    type: date
+    nullable: false
+    description: 评估窗口结束日期。
+  - name: run_path
+    type: path
+    nullable: true
+    description: 上游 run 目录。
+  - name: manifest_path
+    type: path
+    nullable: true
+    description: 上游 manifest 路径。
+  - name: metrics_path
+    type: path
+    nullable: true
+    description: 上游指标文件路径。
+  - name: validation_status
+    type: string
+    nullable: true
+    allowed_values: [PASS, FAIL, true, false, missing, unknown]
+    description: 上游校验状态。
+  - name: created_at
+    type: datetime
+    nullable: true
+    description: 上游实验创建时间。
+  - name: notes
+    type: string
+    nullable: true
+    description: 备注，缺失产物或不可比原因必须写入这里。
+constraints:
+  - evaluation_end_date >= evaluation_start_date
+  - available runs must have manifest_path
+  - available runs should have run_path
+  - missing or not_run rows must explain the reason in notes
+  - comparable rows in one evaluation_id must share data_version, split_version, evaluation window, simulation_rule_version and cost_config_version where applicable
+

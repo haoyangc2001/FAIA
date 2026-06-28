@@ -1,0 +1,19 @@
+method_version: ml_topk_v001
+method_name: ml_topk_linear_baseline
+description: 使用 stage-1 ML-Top-K 特征的确定性线性 baseline，预测未来窗口 SKU order frequency 并按 FDC 内分数选 Top-K。
+model_version: ml_topk_linear_v001
+score_fields:
+  - hist_7d_orders
+  - hist_14d_orders
+  - hist_30d_orders
+  - hist_60d_orders
+  - future_promo_days_14d
+  - future_campaign_days_14d
+  - base_popularity
+tie_break_fields:
+  - historical_order_count
+  - future_promo_score
+  - static_priority_score
+outputs:
+  - ml_topk_result.csv
+  - ml_topk_model_manifest.yaml

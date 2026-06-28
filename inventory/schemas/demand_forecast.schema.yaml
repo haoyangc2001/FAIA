@@ -1,0 +1,128 @@
+version: v001
+table: demand_forecast
+description: 库存分配使用的未来需求预测结果，粒度为决策日期、预测日期、节点、SKU。
+primary_key:
+  - experiment_id
+  - inventory_version
+  - decision_date
+  - forecast_date
+  - node_id
+  - sku_id
+foreign_keys:
+  - field: node_id
+    references: warehouse_master.node_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 库存分配实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: assortment_version
+    type: string
+    nullable: false
+    description: 使用的选品结果版本。
+  - name: inventory_version
+    type: string
+    nullable: false
+    description: 库存分配结果版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: false
+    description: 对齐的仿真规则版本。
+  - name: forecast_method
+    type: string
+    nullable: false
+    allowed_values: [historical_mean, moving_average, seasonal_naive, promotion_adjusted, model]
+    description: 需求预测方法。
+  - name: forecast_version
+    type: string
+    nullable: false
+    description: 需求预测规则或模型版本。
+  - name: model_version
+    type: string
+    nullable: false
+    description: 模型版本；规则 baseline 使用 none。
+  - name: decision_date
+    type: date
+    nullable: false
+    description: 预测生成时点或库存策略决策日期。
+  - name: forecast_date
+    type: date
+    nullable: false
+    description: 被预测的未来需求日期。
+  - name: horizon_day
+    type: integer
+    nullable: false
+    description: forecast_date 相对 decision_date 的预测期序号，从 1 开始。
+  - name: node_id
+    type: string
+    nullable: false
+    description: 需求节点 ID。
+  - name: node_type
+    type: string
+    nullable: false
+    allowed_values: [RDC, FDC]
+    description: 需求节点类型。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: 所属或兜底 RDC。
+  - name: fdc_id
+    type: string
+    nullable: true
+    description: FDC ID；RDC 节点行可为空。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: forecast_qty
+    type: float
+    nullable: false
+    description: 最终用于库存分配的需求预测量。
+  - name: base_forecast_qty
+    type: float
+    nullable: false
+    description: 未叠加促销或日历修正的基础预测量。
+  - name: historical_mean_qty
+    type: float
+    nullable: true
+    description: 历史窗口日均需求。
+  - name: historical_std_qty
+    type: float
+    nullable: true
+    description: 历史窗口日需求标准差。
+  - name: promotion_factor
+    type: float
+    nullable: false
+    description: 未来已知促销修正系数。
+  - name: calendar_factor
+    type: float
+    nullable: false
+    description: 未来已知日历修正系数。
+  - name: feature_window_start_date
+    type: date
+    nullable: false
+    description: 历史特征窗口开始日期。
+  - name: feature_window_end_date
+    type: date
+    nullable: false
+    description: 历史特征窗口结束日期，必须不晚于 decision_date。
+  - name: leakage_safe_flag
+    type: boolean
+    nullable: false
+    description: 是否通过未来信息泄漏检查。
+constraints:
+  - forecast_date >= decision_date
+  - horizon_day >= 1
+  - forecast_qty >= 0
+  - base_forecast_qty >= 0
+  - promotion_factor >= 0
+  - calendar_factor >= 0
+  - feature_window_start_date <= feature_window_end_date
+  - feature_window_end_date <= decision_date
+  - leakage_safe_flag = true

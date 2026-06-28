@@ -1,0 +1,9 @@
+policy_name: greedy_allocation
+policy_version: inventory_greedy_allocation_v001
+description: 当 RDC-SKU 可调拨库存不足时，按需求、成本和库存位置优先级分配。
+parameters:
+  priority_score:
+    demand_weight: 1.0
+    lost_sales_cost_weight: 1.0
+    promotion_weight: 1.0
+    inventory_position_penalty: 1.0

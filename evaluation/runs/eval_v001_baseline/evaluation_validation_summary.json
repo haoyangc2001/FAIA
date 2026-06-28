@@ -1,0 +1,96 @@
+{
+  "evaluation_id": "eval_v001_baseline",
+  "checked_at": "2026-06-28T21:00:02",
+  "manifest_path": "evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml",
+  "passed": true,
+  "checks": [
+    {
+      "name": "required_files_exist",
+      "passed": true,
+      "detail": "all evaluation registry, metrics, comparison and report files exist",
+      "metrics": {
+        "missing_files": [],
+        "checked_files": 4
+      }
+    },
+    {
+      "name": "row_counts_match_manifest",
+      "passed": true,
+      "detail": "CSV row counts match evaluation_manifest",
+      "metrics": {
+        "expected": {
+          "experiment_registry": 4,
+          "metrics_summary": 638,
+          "comparison_table": 14
+        },
+        "actual": {
+          "experiment_registry": 4,
+          "metrics_summary": 638,
+          "comparison_table": 14
+        }
+      }
+    },
+    {
+      "name": "registry_protocol_consistent",
+      "passed": true,
+      "detail": "registry rows share the evaluation protocol",
+      "metrics": {
+        "error_count": 0
+      }
+    },
+    {
+      "name": "metric_protocol_consistent",
+      "passed": true,
+      "detail": "metric rows share the evaluation protocol",
+      "metrics": {
+        "error_count": 0
+      }
+    },
+    {
+      "name": "required_metrics_present",
+      "passed": true,
+      "detail": "required evaluation metrics are present",
+      "metrics": {
+        "missing": []
+      }
+    },
+    {
+      "name": "metric_ranges_valid",
+      "passed": true,
+      "detail": "metric values satisfy ratio and non-negative bounds",
+      "metrics": {
+        "error_count": 0
+      }
+    },
+    {
+      "name": "demand_conservation",
+      "passed": true,
+      "detail": "operational demand metrics conserve total demand",
+      "metrics": {
+        "error_count": 0
+      }
+    },
+    {
+      "name": "cost_conservation",
+      "passed": true,
+      "detail": "operational cost metrics conserve total cost",
+      "metrics": {
+        "error_count": 0
+      }
+    },
+    {
+      "name": "missing_artifacts_explicit",
+      "passed": true,
+      "detail": "missing artifacts are explicitly represented with notes",
+      "metrics": {
+        "error_count": 0
+      }
+    }
+  ],
+  "metrics": {
+    "registry_rows": 4,
+    "metrics_rows": 638,
+    "comparison_rows": 14,
+    "failed_checks": 0
+  }
+}

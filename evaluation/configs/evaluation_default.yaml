@@ -1,0 +1,111 @@
+evaluation_id: eval_v001_baseline
+evaluation_version: evaluation_protocol_v001
+evaluation_root: evaluation
+status: protocol_defined
+objective: Compare available v001 data, assortment, simulation and inventory experiment artifacts under one evaluation protocol.
+
+data_version: v001
+split_version: split_v001
+evaluation_split: test
+evaluation_window:
+  start_date: 2026-06-03
+  end_date: 2026-06-29
+
+versions:
+  candidate_pool_version: candidate_pool_v001
+  k_rule_version: k_rule_v001
+  assortment_version: assortment_hybrid_v001
+  inventory_version: inventory_base_stock_v001
+  simulation_rule_version: sim_rule_v001
+  cost_config_version: cost_config_v001
+  cost_config_path: data/synthetic/v001/cost_config.csv
+
+comparison_protocol:
+  require_same_data_version: true
+  require_same_split_version: true
+  require_same_evaluation_window: true
+  require_same_simulation_rule_version: true
+  require_same_cost_config_version: true
+  allow_missing_declared_runs: true
+  missing_run_status: missing
+
+manifest_sources:
+  data:
+    - data/versions/v001/manifest.yaml
+  assortment:
+    - assortment/runs/exp_assortment_v001_topk/assortment_manifest.yaml
+  simulation:
+    - simulation/runs/sim_smoke_v001_no_transfer/simulation_manifest.yaml
+  inventory:
+    - inventory/runs/exp_inventory_v001_base_stock/inventory_manifest.yaml
+
+baseline_matrix:
+  assortment_methods:
+    - method_name: topk
+      method_family: baseline
+      expected_assortment_version: assortment_topk_v001
+    - method_name: reverse_exclude
+      method_family: heuristic
+      expected_assortment_version: assortment_reverse_exclude_v001
+    - method_name: hybrid
+      method_family: heuristic
+      expected_assortment_version: assortment_hybrid_v001
+    - method_name: ml_topk
+      method_family: ml_model
+      expected_assortment_version: assortment_ml_topk_v001
+  inventory_methods:
+    - method_name: no_transfer
+      method_family: baseline
+      expected_inventory_version: inventory_no_transfer_v001
+    - method_name: historical_mean
+      method_family: heuristic
+      expected_inventory_version: inventory_historical_mean_v001
+    - method_name: base_stock
+      method_family: heuristic
+      expected_inventory_version: inventory_base_stock_v001
+    - method_name: greedy_allocation
+      method_family: heuristic
+      expected_inventory_version: inventory_greedy_allocation_v001
+    - method_name: e2e_inventory_model
+      method_family: e2e_model
+      expected_inventory_version: inventory_e2e_model_v001
+  combination_experiments:
+    - combination_id: topk_base_stock
+      assortment_method: topk
+      inventory_method: base_stock
+      expected_status: planned
+    - combination_id: reverse_exclude_base_stock
+      assortment_method: reverse_exclude
+      inventory_method: base_stock
+      expected_status: planned
+    - combination_id: hybrid_base_stock
+      assortment_method: hybrid
+      inventory_method: base_stock
+      expected_status: planned
+    - combination_id: hybrid_greedy_allocation
+      assortment_method: hybrid
+      inventory_method: greedy_allocation
+      expected_status: planned
+    - combination_id: ml_topk_e2e_inventory
+      assortment_method: ml_topk
+      inventory_method: e2e_inventory_model
+      expected_status: future
+
+expected_outputs:
+  experiment_registry: evaluation/runs/eval_v001_baseline/experiment_registry.csv
+  metrics_summary: evaluation/runs/eval_v001_baseline/metrics_summary.csv
+  comparison_table: evaluation/runs/eval_v001_baseline/comparison_table.csv
+  evaluation_manifest: evaluation/runs/eval_v001_baseline/evaluation_manifest.yaml
+  evaluation_validation_summary: evaluation/runs/eval_v001_baseline/evaluation_validation_summary.json
+  evaluation_validation_report: evaluation/reports/eval_v001_baseline_validation_report.md
+  evaluation_report: evaluation/reports/eval_v001_baseline_report.md
+
+validation:
+  enforce_manifest_presence: true
+  enforce_version_consistency: true
+  enforce_window_consistency: true
+  enforce_metric_completeness: true
+  enforce_ratio_bounds: true
+  enforce_demand_conservation: true
+  enforce_cost_conservation: true
+  allow_missing_inventory_run: true

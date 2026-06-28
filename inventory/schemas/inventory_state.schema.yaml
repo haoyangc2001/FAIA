@@ -1,0 +1,137 @@
+version: v001
+table: inventory_state
+description: 库存分配决策时点的 RDC/FDC/SKU 状态样本，整合 on-hand、reserved、pipeline、assortment mask、eligibility、lead time 和容量状态。
+primary_key:
+  - experiment_id
+  - inventory_version
+  - decision_date
+  - node_id
+  - sku_id
+foreign_keys:
+  - field: node_id
+    references: warehouse_master.node_id
+  - field: rdc_id
+    references: warehouse_master.node_id
+  - field: fdc_id
+    references: warehouse_master.node_id
+  - field: sku_id
+    references: sku_master.sku_id
+fields:
+  - name: experiment_id
+    type: string
+    nullable: false
+    description: 库存分配实验 ID。
+  - name: data_version
+    type: string
+    nullable: false
+    description: 输入数据版本。
+  - name: assortment_version
+    type: string
+    nullable: false
+    description: 使用的选品结果版本。
+  - name: inventory_version
+    type: string
+    nullable: false
+    description: 库存分配结果版本。
+  - name: simulation_rule_version
+    type: string
+    nullable: false
+    description: 对齐的仿真规则版本。
+  - name: decision_date
+    type: date
+    nullable: false
+    description: 库存策略决策日期。
+  - name: source_snapshot_date
+    type: date
+    nullable: false
+    description: 库存状态来源快照日期，必须不晚于 decision_date。
+  - name: node_id
+    type: string
+    nullable: false
+    description: 库存节点 ID，RDC 行为 rdc_id，FDC 行为 fdc_id。
+  - name: node_type
+    type: string
+    nullable: false
+    allowed_values: [RDC, FDC]
+    description: 仓节点类型。
+  - name: rdc_id
+    type: string
+    nullable: false
+    description: 所属或发货 RDC。
+  - name: fdc_id
+    type: string
+    nullable: true
+    description: FDC ID；RDC 节点行可为空。
+  - name: sku_id
+    type: string
+    nullable: false
+    description: SKU ID。
+  - name: on_hand_qty
+    type: integer
+    nullable: false
+    description: 当前账面库存。
+  - name: reserved_qty
+    type: integer
+    nullable: false
+    description: 已预留库存。
+  - name: available_qty
+    type: integer
+    nullable: false
+    description: 可用库存，通常为 max(on_hand_qty - reserved_qty, 0)。
+  - name: in_transit_qty
+    type: integer
+    nullable: false
+    description: 已发出但尚未到达该节点的在途库存。
+  - name: inventory_position_qty
+    type: integer
+    nullable: false
+    description: 库存位置，available_qty + in_transit_qty。
+  - name: assortment_mask
+    type: boolean
+    nullable: false
+    description: FDC-SKU 是否进入当前 assortment；RDC 行可固定为 true。
+  - name: eligible_mask
+    type: boolean
+    nullable: false
+    description: SKU-FDC 是否业务可履约、可售或可调拨。
+  - name: selected_rank
+    type: integer
+    nullable: true
+    description: SKU 在 FDC assortment 中的 rank；RDC 行或未选品行可为空。
+  - name: lead_time_days
+    type: integer
+    nullable: false
+    description: RDC 到 FDC 的调拨提前期。
+  - name: fdc_capacity_units
+    type: integer
+    nullable: true
+    description: FDC SKU 容量或库存容量口径，RDC 行可为空。
+  - name: fdc_active_sku_count
+    type: integer
+    nullable: true
+    description: 当前 FDC 已有正库存或在途库存的 SKU 数，RDC 行可为空。
+  - name: fdc_remaining_capacity_units
+    type: integer
+    nullable: true
+    description: FDC 剩余容量估计，RDC 行可为空。
+  - name: rdc_reserved_qty
+    type: integer
+    nullable: false
+    description: RDC 为自身需求和兜底履约保留的库存量。
+  - name: rdc_allocatable_qty
+    type: integer
+    nullable: false
+    description: 当前 RDC-SKU 可用于 FDC 调拨的库存量。
+constraints:
+  - source_snapshot_date <= decision_date
+  - on_hand_qty >= 0
+  - reserved_qty >= 0
+  - available_qty >= 0
+  - in_transit_qty >= 0
+  - inventory_position_qty = available_qty + in_transit_qty
+  - lead_time_days >= 0
+  - rdc_reserved_qty >= 0
+  - rdc_allocatable_qty >= 0
+  - node_type = FDC 时 fdc_id 不为空
+  - node_type = RDC 时 node_id = rdc_id
+  - assortment_mask = false 时 FDC 节点不允许生成正向 SS/TI 或调拨

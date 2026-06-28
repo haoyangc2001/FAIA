@@ -1,0 +1,13 @@
+policy_name: parameter_search
+policy_version: inventory_parameter_search_v001
+description: 预留通过 simulation 搜索 service_factor 和 replenishment_window 的参数搜索策略；第一版在 4.9 接入仿真后用于评估候选参数。
+parameters:
+  service_factor_grid:
+    - 1.0
+    - 1.28
+    - 1.65
+  replenishment_window_days_grid:
+    - 3
+    - 5
+    - 7
+  selection_metric: total_cost
